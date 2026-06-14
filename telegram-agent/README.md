@@ -25,6 +25,9 @@ multi-tool function calling with persistent memory.
 | Search Agent | Web search via SerpAPI or similar |
 
 ---
+## 📸 Workflow Screenshot
+
+![Workflow](./screenshot.png)
 
 ## ⚙️ Tech Stack
 
