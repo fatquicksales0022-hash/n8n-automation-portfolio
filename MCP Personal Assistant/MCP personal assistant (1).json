@@ -1,0 +1,148 @@
+{
+  "name": "MCP personal assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        16
+      ],
+      "id": "d899b593-82f4-41a5-8c56-ad6ba03802ff",
+      "name": "When chat message received",
+      "webhookId": "c8101c9e-0f15-4f5e-9636-4e5d15e36b11"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a personal assistant. You have the following tools (provided via MCP).\nPrefer using a tool over guessing whenever a request touches one of these areas:\n\n- Calendar — read the user's upcoming events, and create new events.\n- Email (Gmail) — send an email on the user's behalf.\n- Spreadsheets (Google Sheets) — read rows from a sheet.\n- Notes (Supabase) — save notes, reminders, or facts the user wants remembered,\n  and retrieve previously saved notes.\n- Web search (SerpApi) — look up current or factual information on the web.\n- Hacker News — fetch a tech / startup news article by its ID.\n- Calculator — do exact arithmetic.\n\nOperating rules:\n- Call one tool at a time, and read its result before deciding the next step.\n- ALWAYS confirm before any irreversible or outbound action — sending an email\n  or creating a calendar event — by restating exactly what you will do\n  (recipient, subject, date/time, etc.) and waiting for a clear \"yes\".\n  Reading, searching, calculating, saving a note, and retrieving notes do NOT\n  need confirmation.\n- For anything time-sensitive or factual you're unsure about, use web search\n  rather than relying on memory, and cite what you found.\n- When the user asks what they saved or to recall something, use the notes\n  retrieval tool rather than guessing. After saving a note, briefly confirm\n  what you stored.\n- If no tool fits, answer directly. When an answer depends on a tool's result,\n  say which tool you used.\n- Be concise and friendly."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        16
+      ],
+      "id": "2ab8c7b1-9dfd-42a4-9b13-e4bb5e4dae11",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        224
+      ],
+      "id": "fd177a2d-50f8-4b21-beac-776248671c16",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Re9Hguci7X6C0pKF",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        224,
+        224
+      ],
+      "id": "991dcf62-2a81-4aa1-9b96-8ead9f32317a",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://patrickn8n2.app.n8n.cloud/mcp/420332d2-7dde-48ab-bd0a-dad51dd3e457",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        224
+      ],
+      "id": "52271720-c635-4bb4-8c26-f0463654b2d6",
+      "name": "MCP Client"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "34631764-e800-4a69-b45d-1a179677b565",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62723e8c0c4d2def90d739da45e03a3a859e153db925b2a728b12b118a53e7e2"
+  },
+  "nodeGroups": [],
+  "id": "c8CtZozghuI2EjIa",
+  "tags": []
+}
