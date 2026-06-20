@@ -1,9 +1,9 @@
 {
-  "name": "MCP for Claude Desktop",
+  "name": "MCP server tools",
   "nodes": [
     {
       "parameters": {
-        "path": "420332d2-7dde-48ab-bd0a-dad51dd3e457"
+        "path": "YOUR-MCP-SERVER-PATH"
       },
       "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
       "typeVersion": 2,
@@ -13,15 +13,15 @@
       ],
       "id": "8f4e177d-dc86-4432-acab-ff086758cf77",
       "name": "MCP Server Trigger",
-      "webhookId": "420332d2-7dde-48ab-bd0a-dad51dd3e457"
+      "webhookId": "YOUR-MCP-SERVER-PATH"
     },
     {
       "parameters": {
         "calendar": {
           "__rl": true,
-          "value": "fatquicksales0022@gmail.com",
+          "value": "you@example.com",
           "mode": "list",
-          "cachedResultName": "fatquicksales0022@gmail.com"
+          "cachedResultName": "you@example.com"
         },
         "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
         "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
@@ -37,14 +37,14 @@
       "name": "Create an event in Google Calendar",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "rhNZJbQIHfkbPnti",
+          "id": "REPLACE_WITH_YOUR_GOOGLE_CALENDAR_CREDENTIAL",
           "name": "Google Calendar OAuth2 API"
         }
       }
     },
     {
       "parameters": {
-        "sendTo": "fatquicksales0022@gmail.com",
+        "sendTo": "you@example.com",
         "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
         "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
         "options": {}
@@ -60,7 +60,7 @@
       "webhookId": "08f026ee-c514-49e1-b6a9-335b86a82b5a",
       "credentials": {
         "gmailOAuth2": {
-          "id": "qu4dMnWqMOeE4D9H",
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
           "name": "Gmail OAuth2 API"
         }
       }
@@ -70,9 +70,9 @@
         "operation": "getAll",
         "calendar": {
           "__rl": true,
-          "value": "fatquicksales0022@gmail.com",
+          "value": "you@example.com",
           "mode": "list",
-          "cachedResultName": "fatquicksales0022@gmail.com"
+          "cachedResultName": "you@example.com"
         },
         "limit": 5,
         "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
@@ -89,7 +89,7 @@
       "name": "Get many events in Google Calendar",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "XV7bnadpzi8hXZg4",
+          "id": "REPLACE_WITH_YOUR_GOOGLE_CALENDAR_CREDENTIAL",
           "name": "Google Calendar OAuth2 API"
         }
       }
@@ -109,17 +109,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1SoL8vsc75pIHTm8LJ7REO9X2yJrxhjSE6sT585k2ocg",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
-          "cachedResultName": "N8N Test",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoL8vsc75pIHTm8LJ7REO9X2yJrxhjSE6sT585k2ocg/edit?usp=drivesdk"
+          "cachedResultName": "My Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": "gid=0",
           "mode": "list",
-          "cachedResultName": "N8N Test 1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SoL8vsc75pIHTm8LJ7REO9X2yJrxhjSE6sT585k2ocg/edit#gid=0"
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
         },
         "options": {}
       },
@@ -133,7 +133,7 @@
       "name": "Get row(s) in sheet in Google Sheets",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "SW76OQONdCHMenWG",
+          "id": "REPLACE_WITH_YOUR_GOOGLE_SHEETS_CREDENTIAL",
           "name": "Google Sheets OAuth2 API"
         }
       }
@@ -154,7 +154,7 @@
       "name": "Google search in SerpApi",
       "credentials": {
         "serpApi": {
-          "id": "GqPNzrtPmjlZnZ5P",
+          "id": "REPLACE_WITH_YOUR_SERPAPI_CREDENTIAL",
           "name": "SerpApi account"
         }
       }
@@ -187,7 +187,7 @@
       "name": "Create a row in Supabase",
       "credentials": {
         "supabaseApi": {
-          "id": "cbrbs4udSpAXUTzI",
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
           "name": "Supabase account"
         }
       }
@@ -210,7 +210,7 @@
       "name": "Get many rows in Supabase",
       "credentials": {
         "supabaseApi": {
-          "id": "cbrbs4udSpAXUTzI",
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
           "name": "Supabase account"
         }
       }
@@ -307,7 +307,7 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
@@ -315,12 +315,9 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "778e9c66-9b32-499f-b205-5d9a96a4bd5b",
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "62723e8c0c4d2def90d739da45e03a3a859e153db925b2a728b12b118a53e7e2"
+    "templateCredsSetupCompleted": true
   },
   "nodeGroups": [],
-  "id": "4eIg9RSzeSnL2OpY",
   "tags": []
 }
