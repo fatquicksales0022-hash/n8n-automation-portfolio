@@ -1,0 +1,417 @@
+{
+  "name": "Build 3 — WhatsApp lead qualification",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.text }}",
+        "options": {
+          "systemMessage": "=You qualify inbound leads over WhatsApp for [YOUR COMPANY]. Be friendly,\nconcise (WhatsApp-length: 1-3 sentences), and ask ONE question at a time.\n\nCollect, in natural order: the person's need, company, budget range,\nwho makes the decision, and timeline. Don't interrogate — weave\nquestions into a normal conversation and acknowledge their answers.\n\nAs you learn each fact, call upsert_lead to save it. Maintain a running\nscore (0-100): need 30, budget 25, authority 20, timeline 25.\n\n- When score >= 70 AND timeline is now/this_quarter: set stage=qualified,\n  call upsert_lead with that stage, and warmly share this booking link:\n  [YOUR BOOKING LINK].\n- When clearly not a fit (no need or no budget): set stage=disqualified,\n  thank them, and offer a newsletter link.\n- Never invent prices, availability, or commitments. If asked something\n  you don't know, say a human will follow up.\n\nCall upsert_lead immediately after every message where the user shares any new detail (need, company, budget, authority, timeline), saving everything known so far — even if incomplete\n\nKnown so far: {{ JSON.stringify($('Load Lead').item.json) }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "16f5b4d2-fc50-40bd-a046-086e828b27bb",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        208
+      ],
+      "id": "f9d4e468-4e1a-4ec4-8106-fd2e5f2d6c42",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Execute a SQL query in Postgres",
+        "operation": "executeQuery",
+        "query": "INSERT INTO leads (phone, name, company, budget, authority, need, timeline, score, stage, updated_at)\nVALUES (\n  '{{ $('Edit Fields').item.json.phone }}',\n  NULLIF('{{ $fromAI(\"name\") }}', ''),\n  NULLIF('{{ $fromAI(\"company\") }}', ''),\n  NULLIF('{{ $fromAI(\"budget\") }}', ''),\n  NULLIF('{{ $fromAI(\"authority\") }}', ''),\n  NULLIF('{{ $fromAI(\"need\") }}', ''),\n  NULLIF('{{ $fromAI(\"timeline\") }}', ''),\n  NULLIF('{{ $fromAI(\"score\") }}', '')::int,\n  NULLIF('{{ $fromAI(\"stage\") }}', ''),\n  now()\n)\nON CONFLICT (phone) DO UPDATE SET\n  name      = COALESCE(EXCLUDED.name,      leads.name),\n  company   = COALESCE(EXCLUDED.company,   leads.company),\n  budget    = COALESCE(EXCLUDED.budget,    leads.budget),\n  authority = COALESCE(EXCLUDED.authority, leads.authority),\n  need      = COALESCE(EXCLUDED.need,      leads.need),\n  timeline  = COALESCE(EXCLUDED.timeline,  leads.timeline),\n  score     = COALESCE(EXCLUDED.score,     leads.score),\n  stage     = COALESCE(EXCLUDED.stage,     leads.stage),\n  updated_at = now();",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        576,
+        208
+      ],
+      "id": "6452bd80-280b-4e28-93ee-d640d28708dd",
+      "name": "upsert_lead",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_WITH_YOUR_POSTGRES_CREDENTIAL",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a536c84a-f83a-42a6-a5d8-5fc4644d4e96",
+              "leftValue": "={{ $json.stage }}",
+              "rightValue": "qualified",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "0ef1b760-993e-4c6b-8515-08a202c131ff",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel"
+        },
+        "text": "= New qualified lead — budget {{ $json.budget }}, timeline {{ $json.timeline }}, score {{ $json.score }}. Need: {{ $json.need }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        1296,
+        -96
+      ],
+      "id": "2e27aa98-b00a-4594-a773-e19454c7fd49",
+      "name": "Send a message",
+      "webhookId": "d57bdaa7-60e1-4a91-815b-38a8c896c201",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "condition": "eq",
+              "keyValue": "={{ $('Edit Fields').item.json.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        912,
+        0
+      ],
+      "id": "99009198-c48f-44eb-80e9-195003cabb00",
+      "name": "Get many row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "condition": "eq",
+              "keyValue": "={{ $('Edit Fields').item.json.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "78db4c08-6ae9-4f4f-965d-2956758efdcb",
+      "name": "Load Lead",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.phone }}",
+        "tableName": "whatsapp_memory",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        432,
+        208
+      ],
+      "id": "d43ceefa-78ef-4a15-9dad-f7f3d43e2e9e",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_WITH_YOUR_POSTGRES_CREDENTIAL",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "6e04302a-3730-4650-984c-27b739f74b62",
+      "name": "WhatsApp Trigger",
+      "webhookId": "ba88589e-68b5-4e1e-b72b-bf8d9daa9ff2",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "REPLACE_WITH_YOUR_WHATSAPP_TRIGGER_CREDENTIAL",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45c8384a-3ab6-4896-a5bc-976389c4bcde",
+              "name": "phone",
+              "value": "={{ $json.messages[0].from }}",
+              "type": "string"
+            },
+            {
+              "id": "20b41c41-50a9-4e4c-94d6-69832107ddc3",
+              "name": "text",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "54d91c11-9fd9-483e-9b03-9109fe1766d9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "YOUR_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $('Edit Fields').item.json.phone }}",
+        "textBody": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        0
+      ],
+      "id": "debd95ea-858a-4a53-b0de-ffc6984f0c02",
+      "name": "Send message",
+      "webhookId": "802e7af8-90f4-4568-8c32-a9bbd09707e6",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE_WITH_YOUR_WHATSAPP_CREDENTIAL",
+          "name": "WhatsApp account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upsert_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Lead": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Load Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Get many row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}

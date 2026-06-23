@@ -13,7 +13,7 @@ A collection of production-ready AI automation workflows built with n8n, OpenAI,
 | [rag-chatbot](./rag-chatbot/) | RAG chatbot that answers questions from your own documents, auto-synced from Google Drive | n8n · Pinecone · OpenAI · Google Drive |
 | [email-automation](./email-automation/) | Reads, classifies, drafts, and sends emails autonomously | n8n · GPT-4o · Gmail |
 | [competitor-intelligence](./competitor-intelligence/) | Tracks competitors daily, summarizes only what changed with AI, delivers a weekly digest + a RAG chat | n8n · OpenAI · Supabase/pgvector · Slack |
-| [whatsapp-lead-qualifier](./whatsapp-lead-qualifier/) | Qualifies leads via WhatsApp conversation with persistent state + CRM writes | n8n · GPT-4o · WhatsApp API · HubSpot |
+| [whatsapp-lead-qualifier](./whatsapp-lead-qualifier/) | Qualifies inbound leads over WhatsApp — multi-turn BANT conversation, persistent state, scoring, and a Slack alert on hot leads | n8n · OpenAI · Supabase · WhatsApp · Slack |
 | [rag-support-chatbot](./rag-support-chatbot/) | Customer support chatbot with semantic search over your knowledge base | n8n · Pinecone · GPT-4o · Google Drive |
 | [social-media-bot](./social-media-bot/) | Generates and publishes platform-native content to LinkedIn, Twitter, Instagram | n8n · GPT-4o · LinkedIn API · Buffer |
 | [email-triage-agent](./email-triage-agent/) | Classifies every inbound email, drafts replies, archives noise, alerts on urgent | n8n · GPT-4o · Gmail · Google Calendar |
