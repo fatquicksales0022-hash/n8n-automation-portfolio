@@ -1,0 +1,786 @@
+{
+  "name": "Competitor Intel - Crawl",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=0 0 7 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        -432
+      ],
+      "id": "aff33913-7fab-49d3-a50d-b9e778a403ac",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "competitors",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -432
+      ],
+      "id": "40b79dba-842d-41cf-bd2a-dd763799bc3b",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        128,
+        -432
+      ],
+      "id": "af822e23-0840-4186-ad7c-1b8e819a575e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "rss",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "391c612b-b4fc-49f2-b789-caeabd451d32"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "rss"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7781b9e-a01a-4b82-899d-98c2b6cbcf16",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "page",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "page"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "82aad6e5-6dac-4ec8-9889-a2b74f04a92d",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "js",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "js"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -432
+      ],
+      "id": "89e799db-6970-4d9d-83d6-cd24751a7643",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        -432
+      ],
+      "id": "5a404212-c3b4-437e-b516-74acea94115e",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -432
+      ],
+      "id": "e8ac97bc-d2d7-42fe-94d4-0e350286c770",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b15f4dc-01bb-424e-aa67-b061b6218c41",
+              "name": "competitor",
+              "value": "={{ $('Loop Over Items').item.json.competitor }}",
+              "type": "string"
+            },
+            {
+              "id": "efb37b2c-2745-4217-adc0-34630296e8d2",
+              "name": "url",
+              "value": "={{ $('Loop Over Items').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "2dc2f51b-758e-4ac4-8a3a-dd95822f9d08",
+              "name": "last_hash",
+              "value": "={{ $('Loop Over Items').item.json.last_hash || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "5a679b6a-f96a-465f-9cf5-99f7e9828048",
+              "name": "last_text",
+              "value": "={{ $('Loop Over Items').item.json.last_text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "fe332d25-9516-43c2-adfe-b129dc34bfdb",
+              "name": "text",
+              "value": "={{ ($json.title + ' — ' + ($json.content || '')).toString().slice(0, 8000) }}",
+              "type": "string"
+            },
+            {
+              "id": "355927f8-9669-4509-9d96-9411e104f8d0",
+              "name": "brand",
+              "value": "={{ $('Loop Over Items').item.json.brand }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        -432
+      ],
+      "id": "4ad2711d-832d-4cba-bad1-4edabc35dbae",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "value": "={{ $json.text }}",
+        "dataPropertyName": "hash"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        -432
+      ],
+      "id": "0957a180-bbaa-47fa-bf97-46162609781d",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6679e067-c782-4450-84c4-c6de4240011c",
+              "leftValue": "={{ $json.hash }}",
+              "rightValue": "={{ $json.last_hash }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1472,
+        -432
+      ],
+      "id": "ce4a1d9c-4f2a-4eda-a59d-748f3e41d216",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "text": "=Previous content: {{ $json.last_text }}\n\nNew content: {{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "change_type",
+              "description": "The single best category. Must be exactly one of: pricing, product, messaging, hiring, news, none. Use none if the change is cosmetic, navigational, or just a date/timestamp"
+            },
+            {
+              "name": "significance",
+              "description": "How important the change is. Exactly one of: high, medium, low."
+            },
+            {
+              "name": "summary",
+              "description": "One neutral sentence describing what changed."
+            },
+            {
+              "name": "implication",
+              "description": "One sentence on what this could mean for us."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=You analyze competitor web content. Compare the previous and new content and\nreport what changed and why it matters. Only report real changes. If the diff\nis cosmetic, navigational, or just a new date/timestamp, set change_type = none.\nOn a first run with no previous content, summarize the new content as the\ncurrent state and pick the best-fit change_type."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        -608
+      ],
+      "id": "0e2b428f-1fc2-4e28-b404-1b67107c9cbf",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        -416
+      ],
+      "id": "aa14d942-4560-4cf6-8abf-80d462a9a619",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "intel_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "competitor",
+              "fieldValue": "={{ $('Build Document').first().json.competitor }}"
+            },
+            {
+              "fieldId": "url",
+              "fieldValue": "={{ $('Build Document').first().json.url }}"
+            },
+            {
+              "fieldId": "change_type",
+              "fieldValue": "={{ $('Build Document').first().json.change_type }}"
+            },
+            {
+              "fieldId": "significance",
+              "fieldValue": "={{ $('Build Document').first().json.significance }}"
+            },
+            {
+              "fieldId": "summary",
+              "fieldValue": "={{ $('Information Extractor').first().json.output.summary }}"
+            },
+            {
+              "fieldId": "implication",
+              "fieldValue": "={{ $('Information Extractor').first().json.output.implication }}"
+            },
+            {
+              "fieldId": "brand",
+              "fieldValue": "={{ $('Build Document').first().json.brand }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        -608
+      ],
+      "id": "bbc7341d-0b3d-4771-be30-1f6e1f201f31",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "competitors",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "url",
+              "condition": "eq",
+              "keyValue": "={{ $('Crypto').item.json.url }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "last_hash",
+              "fieldValue": "={{ $('Crypto').item.json.hash }}"
+            },
+            {
+              "fieldId": "last_text",
+              "fieldValue": "={{ $('Crypto').item.json.text }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        -192
+      ],
+      "id": "3d113273-589d-4e09-8344-d5c75c022ee8",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "competitor_intel",
+          "mode": "list",
+          "cachedResultName": "competitor_intel"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2256,
+        -608
+      ],
+      "id": "f7a21055-294a-40e7-821a-3f5255b9a99e",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_SUPABASE_CREDENTIAL",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2224,
+        -400
+      ],
+      "id": "bf2c996a-256d-4204-b8da-d78bf9430a8c",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Information Extractor').item.json.output.summary }} — {{ $('Information Extractor').item.json.output.implication }} (competitor: {{ $('Crypto').item.json.competitor }})",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "competitor",
+                "value": "={{ $('Build Document').item.json.competitor }}"
+              },
+              {
+                "name": "url",
+                "value": "={{ $('Build Document').item.json.url }}"
+              },
+              {
+                "name": "date",
+                "value": "={{ $('Build Document').item.json.date }}"
+              },
+              {
+                "name": "significance",
+                "value": "={{ $('Build Document').item.json.significance }}"
+              },
+              {
+                "name": "change_type",
+                "value": "={{ $('Build Document').item.json.change_type }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2352,
+        -400
+      ],
+      "id": "a1165719-c7a4-4006-9857-d5f4d7b43015",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3746c678-f04d-4f6a-a375-51ea7b152873",
+              "name": "content",
+              "value": "={{ $('Information Extractor').first().json.output.summary }} — {{ $('Information Extractor').first().json.output.implication }} (competitor: {{ $('Edit Fields').first().json.competitor }})",
+              "type": "string"
+            },
+            {
+              "id": "19fae0b0-d3e3-49c6-95dd-66145482c376",
+              "name": "competitor",
+              "value": "={{ $('Edit Fields').first().json.competitor }}",
+              "type": "string"
+            },
+            {
+              "id": "3a23ccd3-3dee-438a-9385-4a599232690a",
+              "name": "url",
+              "value": "={{ $('Edit Fields').first().json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "29bcdab1-50ef-4829-b29e-ed954b3668c7",
+              "name": "date",
+              "value": "={{ $now.toISODate() }}",
+              "type": "string"
+            },
+            {
+              "id": "a101f716-8177-4762-ab2a-8fd4d9a371a5",
+              "name": "significance",
+              "value": "={{ $('Information Extractor').first().json.output.significance }}",
+              "type": "string"
+            },
+            {
+              "id": "40f07372-dd03-4b9e-b508-0ffd9219b334",
+              "name": "change_type",
+              "value": "={{ $('Information Extractor').first().json.output.change_type }}",
+              "type": "string"
+            },
+            {
+              "id": "2a99fa13-6205-47a4-8331-49adae31ccc6",
+              "name": "brand",
+              "value": "={{ $('Edit Fields').first().json.brand }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2064,
+        -608
+      ],
+      "id": "4d4c2efa-c2ea-48d5-8edd-c5109e87ac00",
+      "name": "Build Document"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Build Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Document": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}

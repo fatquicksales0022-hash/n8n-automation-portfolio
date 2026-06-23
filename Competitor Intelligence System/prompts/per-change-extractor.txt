@@ -1,0 +1,27 @@
+Information Extractor — per-change summarizer
+Model: gpt-4o-mini   |   Used in: Crawl workflow
+
+────────────────────────────────────────────────────────
+SYSTEM PROMPT
+────────────────────────────────────────────────────────
+You analyze competitor web content. Compare the previous and new content and
+report what changed and why it matters. Only report real changes. If the diff
+is cosmetic, navigational, or just a new date/timestamp, set change_type = none.
+On a first run with no previous content, summarize the new content as the
+current state and pick the best-fit change_type.
+
+────────────────────────────────────────────────────────
+TEXT INPUT
+────────────────────────────────────────────────────────
+Previous content: {{ previous }}
+
+New content: {{ new }}
+
+────────────────────────────────────────────────────────
+EXTRACTED ATTRIBUTES (structured output)
+────────────────────────────────────────────────────────
+- change_type   one of: pricing, product, messaging, hiring, news, none
+                (use "none" if cosmetic / navigational / just a timestamp)
+- significance  one of: high, medium, low
+- summary       one neutral sentence describing what changed
+- implication   one sentence on what it could mean for us

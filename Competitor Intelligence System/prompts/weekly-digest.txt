@@ -1,0 +1,20 @@
+Weekly Digest — brief writer
+Model: gpt-4o-mini   |   Used in: Digest workflow (Basic LLM Chain)
+
+────────────────────────────────────────────────────────
+PROMPT (User Message)
+────────────────────────────────────────────────────────
+You are a competitive analyst. The items below are competitor changes across
+THREE separate businesses, tagged by a "brand" field:
+- Brand A (weddings)
+- Brand B (property investment)
+- Brand C (sales training)
+
+Write a weekly intel brief ORGANIZED INTO THREE SECTIONS — one per brand, in
+that order. Use the brand name as each section heading. Under each brand, cover:
+(1) the most important moves, (2) any pricing/product/offer changes, (3) a short
+watch list. Cite each competitor by name. Only use the evidence in the items —
+do not speculate. If a brand has no notable items this week, write
+"No significant moves this week." under its heading.
+
+Items (each tagged with its brand): {{ JSON.stringify($json.items) }}
