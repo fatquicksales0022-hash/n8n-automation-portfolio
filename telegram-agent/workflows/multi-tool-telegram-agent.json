@@ -19,7 +19,7 @@
       "webhookId": "d56708f7-9926-4e77-b0bf-3ea8949306b2",
       "credentials": {
         "telegramApi": {
-          "id": "ri01NtoRubLhysz1",
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL",
           "name": "Telegram account"
         }
       }
@@ -152,7 +152,7 @@
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "U8tQ3q1a5LAubM5J",
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
           "name": "OpenAI account"
         }
       }
@@ -174,7 +174,7 @@
       "webhookId": "6a931d1a-56fb-46d6-96e6-49c3ab0ef69e",
       "credentials": {
         "telegramApi": {
-          "id": "ri01NtoRubLhysz1",
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL",
           "name": "Telegram account"
         }
       }
@@ -195,7 +195,7 @@
       "name": "Transcribe a recording",
       "credentials": {
         "openAiApi": {
-          "id": "U8tQ3q1a5LAubM5J",
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
           "name": "OpenAI account"
         }
       }
@@ -234,7 +234,7 @@
       "webhookId": "93c66429-3a34-4803-aad7-218a9b7b252d",
       "credentials": {
         "telegramApi": {
-          "id": "ri01NtoRubLhysz1",
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL",
           "name": "Telegram account"
         }
       }
@@ -359,7 +359,7 @@
       "name": "OpenAI Chat Model1",
       "credentials": {
         "openAiApi": {
-          "id": "U8tQ3q1a5LAubM5J",
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
           "name": "OpenAI account"
         }
       }
@@ -380,7 +380,7 @@
       "name": "Generate audio",
       "credentials": {
         "openAiApi": {
-          "id": "U8tQ3q1a5LAubM5J",
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
           "name": "OpenAI account"
         }
       }
@@ -403,7 +403,7 @@
       "webhookId": "7ee527dc-e930-40f5-9db1-9146783a5354",
       "credentials": {
         "telegramApi": {
-          "id": "ri01NtoRubLhysz1",
+          "id": "REPLACE_WITH_YOUR_TELEGRAM_CREDENTIAL",
           "name": "Telegram account"
         }
       }
@@ -583,12 +583,9 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "13283dfb-0846-4421-86b3-c9dcf1fc0dcd",
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "5ecad9500742c6c73149150713a97eeb3dc2cd3803bc96379fc8a174bea94fcf"
+    "templateCredsSetupCompleted": true
   },
   "nodeGroups": [],
-  "id": "ZT1Qa0rFlxBgR9f5",
   "tags": []
 }

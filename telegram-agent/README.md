@@ -27,7 +27,7 @@ multi-tool function calling with persistent memory.
 ---
 ## 📸 Workflow Screenshot
 
-![Workflow](./screenshot.png)
+![Workflow](docs/workflow.png)
 
 ## ⚙️ Tech Stack
 
@@ -41,7 +41,7 @@ multi-tool function calling with persistent memory.
 
 ## 🚀 How to Use
 
-1. Import `workflow.json` into your n8n instance
+1. Import `workflows/multi-tool-telegram-agent.json` into your n8n instance
 2. Set credentials: Telegram Bot, OpenAI, Gmail/Calendar
 3. Activate the workflow
 4. Message your Telegram bot

@@ -12,7 +12,7 @@ A collection of production-ready AI automation workflows built with n8n, OpenAI,
 | [lead-assistant](./lead-assistant/) | AI agent that captures, qualifies, and writes leads to CRM automatically | n8n · GPT-4o · HubSpot · Gmail |
 | [rag-chatbot](./rag-chatbot/) | RAG chatbot that answers questions from your own documents, auto-synced from Google Drive | n8n · Pinecone · OpenAI · Google Drive |
 | [email-automation](./email-automation/) | Reads, classifies, drafts, and sends emails autonomously | n8n · GPT-4o · Gmail |
-| [competitor-intelligence](./competitor-intelligence/) | Scrapes competitors weekly, summarizes changes with LLM, delivers digest | n8n · Flowise · Apify · SerpAPI |
+| [competitor-intelligence](./competitor-intelligence/) | Tracks competitors daily, summarizes only what changed with AI, delivers a weekly digest + a RAG chat | n8n · OpenAI · Supabase/pgvector · Slack |
 | [whatsapp-lead-qualifier](./whatsapp-lead-qualifier/) | Qualifies leads via WhatsApp conversation with persistent state + CRM writes | n8n · GPT-4o · WhatsApp API · HubSpot |
 | [rag-support-chatbot](./rag-support-chatbot/) | Customer support chatbot with semantic search over your knowledge base | n8n · Pinecone · GPT-4o · Google Drive |
 | [social-media-bot](./social-media-bot/) | Generates and publishes platform-native content to LinkedIn, Twitter, Instagram | n8n · GPT-4o · LinkedIn API · Buffer |
@@ -47,4 +47,4 @@ A collection of production-ready AI automation workflows built with n8n, OpenAI,
 **Patrick Sales** — Senior Automation & AI Engineer  
 Building AI agents and workflow automations that eliminate manual work.
 
-[LinkedIn]([#](https://www.linkedin.com/in/patrickomarsales/)) | [Email](fatquicksales0022@gmail.com)
+[LinkedIn](https://www.linkedin.com/in/patrickomarsales/) | [Email](mailto:fatquicksales0022@gmail.com)
