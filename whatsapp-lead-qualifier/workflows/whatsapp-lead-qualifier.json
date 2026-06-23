@@ -122,7 +122,7 @@
       ],
       "id": "2e27aa98-b00a-4594-a773-e19454c7fd49",
       "name": "Send a message",
-      "webhookId": "d57bdaa7-60e1-4a91-815b-38a8c896c201",
+      "webhookId": "83d39ce1-e988-4481-b147-6ff1bb9df5c2",
       "credentials": {
         "slackOAuth2Api": {
           "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
@@ -228,7 +228,7 @@
       ],
       "id": "6e04302a-3730-4650-984c-27b739f74b62",
       "name": "WhatsApp Trigger",
-      "webhookId": "ba88589e-68b5-4e1e-b72b-bf8d9daa9ff2",
+      "webhookId": "6200e992-ff36-4687-b50c-63b7bda08227",
       "credentials": {
         "whatsAppTriggerApi": {
           "id": "REPLACE_WITH_YOUR_WHATSAPP_TRIGGER_CREDENTIAL",
@@ -281,7 +281,7 @@
       ],
       "id": "debd95ea-858a-4a53-b0de-ffc6984f0c02",
       "name": "Send message",
-      "webhookId": "802e7af8-90f4-4568-8c32-a9bbd09707e6",
+      "webhookId": "b51ec567-3ba8-48ff-bcb1-78f07a953aa8",
       "credentials": {
         "whatsAppApi": {
           "id": "REPLACE_WITH_YOUR_WHATSAPP_CREDENTIAL",
