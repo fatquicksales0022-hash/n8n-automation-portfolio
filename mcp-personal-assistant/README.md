@@ -28,6 +28,8 @@ It remembers the conversation across turns, and it gates every irreversible acti
 
 ## Architecture
 
+> 📖 **[WALKTHROUGH.md](WALKTHROUGH.md)** explains every node in both workflows, line by line.
+
 The project is **two workflows** that meet over MCP:
 
 1. **MCP server** (`workflows/mcp-server-tools.json`) — an `MCP Server Trigger` with

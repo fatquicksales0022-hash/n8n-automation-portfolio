@@ -4,6 +4,8 @@ A production-ready AI agent built in n8n that handles both text and voice
 messages via Telegram, routes them intelligently, and responds using 
 multi-tool function calling with persistent memory.
 
+> 📖 **[WALKTHROUGH.md](WALKTHROUGH.md)** explains every node, line by line.
+
 ---
 
 ## 🧠 What It Does

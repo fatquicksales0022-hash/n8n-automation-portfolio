@@ -12,6 +12,8 @@ later** exactly where they left off.
 
 Build 3 of a six-build AI automation portfolio.
 
+> 📖 **[WALKTHROUGH.md](WALKTHROUGH.md)** explains every node in the workflow, line by line.
+
 ---
 
 ## What it does
