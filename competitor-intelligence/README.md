@@ -83,6 +83,8 @@ entirely — so crawling all competitors every day costs cents, not dollars.
 1. **Create the database** — run [`sql/schema.sql`](sql/schema.sql) in Supabase's
    SQL Editor. It creates the `competitors`, `competitor_intel`, and `intel_log`
    tables, the `match_competitor_intel` search function, and an example watch-list.
+   New to SQL? [`sql/schema-explained.sql`](sql/schema-explained.sql) is the exact
+   same schema annotated **line by line**.
 2. **Import the three workflows** into n8n (`Workflows → ⋯ → Import from File`):
    `workflows/crawl.json`, `workflows/digest.json`, `workflows/chat.json`.
 3. **Create credentials** in your n8n instance and select them on each node:
