@@ -32,6 +32,9 @@ Build 2 of a six-build AI automation portfolio.
 
 ![Architecture](docs/architecture.svg)
 
+> 📖 **Want the details?** [`WALKTHROUGH.md`](WALKTHROUGH.md) explains every node in all
+> three workflows — and the key expressions — line by line.
+
 Three workflows over one shared Supabase store — *write the intel once, read it
 two ways*:
 
