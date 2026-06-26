@@ -17,13 +17,12 @@ A collection of production-ready AI automation workflows built with n8n, OpenAI,
 
 ## 🛠 Core Stack
 
-- **Orchestration:** n8n (self-hosted)
-- **LLM:** OpenAI GPT-4o
-- **Vector DB:** Pinecone
-- **Memory:** n8n Simple Memory 
-- **Interfaces:** Telegram · WhatsApp · Web · Gmail
-- **LLM Chaining:** Flowise
-- **Scraping:** Apify · SerpAPI
+- **Orchestration:** n8n (cloud / self-hosted)
+- **LLM:** OpenAI GPT-4o / GPT-4o-mini (+ Whisper for voice)
+- **Vector DB:** Supabase (Postgres + pgvector)
+- **Memory:** n8n Simple Memory · Postgres Chat Memory
+- **Interfaces:** Telegram · WhatsApp · Web chat · Gmail · Slack
+- **Integrations:** MCP · SerpAPI (web search) · Google Calendar / Sheets
 
 ---
 
