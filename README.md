@@ -8,16 +8,10 @@ A collection of production-ready AI automation workflows built with n8n, OpenAI,
 
 | Project | Description | Stack |
 |---------|-------------|-------|
-| [telegram-agent](./telegram-agent/) | Multi-tool AI agent triggered by Telegram — handles text & voice, tools for calendar, email, and web search | n8n · GPT-4o · Telegram · Whisper |
-| [lead-assistant](./lead-assistant/) | AI agent that captures, qualifies, and writes leads to CRM automatically | n8n · GPT-4o · HubSpot · Gmail |
-| [rag-chatbot](./rag-chatbot/) | RAG chatbot that answers questions from your own documents, auto-synced from Google Drive | n8n · Pinecone · OpenAI · Google Drive |
-| [email-automation](./email-automation/) | Reads, classifies, drafts, and sends emails autonomously | n8n · GPT-4o · Gmail |
+| [mcp-personal-assistant](./mcp-personal-assistant/) | MCP-powered personal assistant with calendar, email, search, memory, and notes | MCP · GPT-4o-mini · Supabase · n8n |
 | [competitor-intelligence](./competitor-intelligence/) | Tracks competitors daily, summarizes only what changed with AI, delivers a weekly digest + a RAG chat | n8n · OpenAI · Supabase/pgvector · Slack |
 | [whatsapp-lead-qualifier](./whatsapp-lead-qualifier/) | Qualifies inbound leads over WhatsApp — multi-turn BANT conversation, persistent state, scoring, and a Slack alert on hot leads | n8n · OpenAI · Supabase · WhatsApp · Slack |
-| [rag-support-chatbot](./rag-support-chatbot/) | Customer support chatbot with semantic search over your knowledge base | n8n · Pinecone · GPT-4o · Google Drive |
-| [social-media-bot](./social-media-bot/) | Generates and publishes platform-native content to LinkedIn, Twitter, Instagram | n8n · GPT-4o · LinkedIn API · Buffer |
-| [email-triage-agent](./email-triage-agent/) | Classifies every inbound email, drafts replies, archives noise, alerts on urgent | n8n · GPT-4o · Gmail · Google Calendar |
-| [mcp-personal-assistant](./mcp-personal-assistant/) | MCP-powered personal assistant with calendar, email, search, memory, and files | MCP · GPT-4o / Claude · Node.js |
+| [telegram-agent](./telegram-agent/) | Multi-tool AI agent triggered by Telegram — handles text & voice, tools for calendar, email, and web search | n8n · GPT-4o · Telegram · Whisper |
 
 ---
 
