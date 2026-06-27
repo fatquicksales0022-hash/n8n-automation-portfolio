@@ -74,6 +74,24 @@ table's `vector(1536)` dimension is tied to this model too.
 
 ---
 
+## Screenshots
+
+**Ingestion workflow** — Schedule → wipe → Drive search → download → extract → embed → Supabase:
+
+![Ingestion workflow](docs/ingestion-workflow.png)
+
+**Chatbot workflow** — Chat Trigger → AI Agent with chat model, memory, and the `search_docs` retrieval tool:
+
+![Chatbot workflow](docs/chat-workflow.png)
+
+**Grounded answers — every claim cites its source file:**
+
+![Warranty question, answered from the troubleshooting doc](docs/chat-answer-warranty.png)
+
+![Returns question, answered from the orders doc](docs/chat-answer-returns.png)
+
+---
+
 ## Tech stack
 
 - **n8n** (cloud or self-hosted) — orchestration
