@@ -1,0 +1,16 @@
+# Never commit real credentials or secrets
+*.env
+.env*
+secrets.json
+credentials.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Raw, unsanitized n8n exports (keep these out of the repo)
+*-raw.json
+exports-raw/
