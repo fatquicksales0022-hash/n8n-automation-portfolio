@@ -81,6 +81,30 @@ entirely — so crawling all competitors every day costs cents, not dollars.
 
 ---
 
+## Screenshots
+
+**Crawl pipeline** — a full run: scrape → hash-diff → AI summarize → vector store + log (item counts on every node):
+
+![Crawl workflow executed](docs/crawl-workflow.png)
+
+**The chat** — a RAG agent answering a real competitive question, grounded in the stored intel:
+
+![Chat agent answering](docs/chat-answer.png)
+
+**Real competitors tracked** — the `competitors` seed across three businesses (weddings, property, sales training):
+
+![Competitors table](docs/competitors-seed.png)
+
+**Vector store** — `competitor_intel`: each detected change embedded for retrieval (content + metadata + 1536-d vector):
+
+![competitor_intel vector table](docs/vector-store.png)
+
+**Relational log** — `intel_log`: every change with type, significance, summary, and business implication (the digest's source):
+
+![intel_log table](docs/intel-log.png)
+
+---
+
 ## Tech stack
 
 - **n8n** (cloud or self-hosted) — orchestration
