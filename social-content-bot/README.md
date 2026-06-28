@@ -63,6 +63,26 @@ APPROVE & PUBLISH  (human in the loop)
         └─ false → (nothing published; optionally mark status=rejected)
 ```
 
+## Screenshots
+
+**The workflow** — Schedule → Sheets queue → generate → critique → Slack approval → IF → Ayrshare → log:
+
+![Workflow canvas](docs/workflow-canvas.png)
+
+**The human gate** — drafts posted to Slack with Approve / Decline buttons; the workflow stays paused until a click:
+
+![Slack approval message](docs/slack-approval.png)
+
+**Closed loop** — on approval, the row is marked `posted` with the live post URL written back:
+
+![Content calendar logged](docs/sheet-logged.png)
+
+**The result** — the approved post, live on LinkedIn:
+
+![Published LinkedIn post](docs/linkedin-post.png)
+
+---
+
 ### The two ideas that make this work
 
 1. **Structured output, not prose.** Each platform gets its own object with its own
