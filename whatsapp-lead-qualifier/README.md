@@ -81,6 +81,18 @@ decide whether to alert sales.
 
 ---
 
+## Screenshots
+
+**The workflow** — a full run: WhatsApp Trigger → load lead → AI Agent (with `upsert_lead` tool + Postgres chat memory) → reply → check stage → IF qualified → Slack:
+
+![Workflow executed](docs/workflow-canvas.png)
+
+**A real conversation** — the agent runs the BANT qualification over WhatsApp and, once the lead qualifies, hands over a booking link:
+
+![WhatsApp lead qualified](docs/whatsapp-qualified.png)
+
+---
+
 ## Tech stack
 
 - **n8n** (cloud or self-hosted) — orchestration
