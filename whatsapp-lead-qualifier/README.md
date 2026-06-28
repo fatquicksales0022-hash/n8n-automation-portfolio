@@ -16,6 +16,20 @@ Build 3 of a six-build AI automation portfolio.
 
 ---
 
+## Why this exists
+
+**The problem —** inbound leads go cold fast. If no one replies within minutes, interest
+drops — but replying instantly to *every* lead, 24/7, and asking the right qualifying
+questions, is more than a sales team can do by hand. Most leads also aren't a fit, so
+reps waste time triaging.
+
+**The result —** an agent that answers WhatsApp leads instantly, any hour, runs a real
+BANT qualification as a natural back-and-forth, and saves every fact as it learns it —
+so a lead can pick up days later right where they left off. Hot leads get a booking
+link and fire a Slack alert to sales; unqualified ones never eat a rep's time.
+
+---
+
 ## What it does
 
 - **Listens** for inbound WhatsApp messages (WhatsApp Business Cloud API).
@@ -135,6 +149,21 @@ It qualifies turn by turn, a row fills in on the `leads` table, and once it hits
   user (which bypasses RLS), so nothing is exposed to the public `anon` key.
 - **Lead data lives in the database, not the workflow** — the exported JSON
   reveals no real conversations or contacts.
+
+---
+
+## Results & highlights
+
+- **Instant 24/7 first response** — the gap that kills inbound conversion is closed by
+  an agent that never sleeps.
+- **Resumable conversations** — facts and dialogue are persisted per phone number, so a
+  half-finished chat continues days later instead of starting over.
+- **Qualifies *and* routes** — runs full BANT, scores 0–100, and only the hot leads
+  reach sales (booking link + Slack alert), so reps stop triaging tyre-kickers.
+- **Channel-agnostic core** — built behind a Chat Trigger first, WhatsApp swapped in
+  last; the same agent drops onto web chat or another channel unchanged.
+
+> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 

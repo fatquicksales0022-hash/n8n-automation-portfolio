@@ -2,17 +2,23 @@
 
 A collection of production-ready AI automation workflows built with n8n, OpenAI, and complementary tools. Each project solves a real business problem — lead generation, customer support, competitive intelligence, and more.
 
+Every folder is a self-contained case study: a README with the problem it solves and
+the result, an architecture diagram, the exported workflow JSON, and a node-by-node
+walkthrough. Click any project below.
+
 ---
 
 ## 📂 Projects
 
-| Project | Description | Stack |
-|---------|-------------|-------|
-| [mcp-personal-assistant](./mcp-personal-assistant/) | MCP-powered personal assistant with calendar, email, search, memory, and notes | MCP · GPT-4o-mini · Supabase · n8n |
-| [competitor-intelligence](./competitor-intelligence/) | Tracks competitors daily, summarizes only what changed with AI, delivers a weekly digest + a RAG chat | n8n · OpenAI · Supabase/pgvector · Slack |
-| [whatsapp-lead-qualifier](./whatsapp-lead-qualifier/) | Qualifies inbound leads over WhatsApp — multi-turn BANT conversation, persistent state, scoring, and a Slack alert on hot leads | n8n · OpenAI · Supabase · WhatsApp · Slack |
-| [rag-support-chatbot](./rag-support-chatbot/) | Customer-support chatbot that auto-syncs a Google Drive folder into a vector store and answers grounded in those docs — cites sources, refuses what isn't documented | n8n · OpenAI · Supabase/pgvector · Google Drive |
-| [telegram-agent](./telegram-agent/) | Multi-tool AI agent triggered by Telegram — handles text & voice, tools for calendar, email, and web search | n8n · GPT-4o · Telegram · Whisper |
+| Project | The problem it solves | Stack |
+|---------|-----------------------|-------|
+| [mcp-personal-assistant](./mcp-personal-assistant/) | **Scattered daily tasks → one chat.** A single agent reaches calendar, email, sheets, notes, web search, and math over MCP — picking the right tool itself, gating irreversible actions. | MCP · GPT-4o-mini · Supabase · n8n |
+| [competitor-intelligence](./competitor-intelligence/) | **Replaces a $100s/mo SaaS.** Tracks competitors daily, uses AI to surface *only what changed* (hash-diff keeps it cents/day), and ships a sectioned weekly brief + a RAG chat — across 3 businesses. | n8n · OpenAI · Supabase/pgvector · Slack |
+| [whatsapp-lead-qualifier](./whatsapp-lead-qualifier/) | **No inbound lead goes cold.** Answers WhatsApp leads instantly 24/7, runs a full BANT qualification, saves state per phone (resumable), then routes hot leads to a booking link + Slack alert. | n8n · OpenAI · Supabase · WhatsApp · Slack |
+| [rag-support-chatbot](./rag-support-chatbot/) | **Support answers that don't hallucinate.** Auto-syncs a Google Drive folder into a vector store and answers *only* from those docs — cites the source file, refuses what isn't documented. | n8n · OpenAI · Supabase/pgvector · Google Drive |
+| [telegram-agent](./telegram-agent/) | **Hands-free assistant in Telegram.** Takes voice or text, transcribes with Whisper, and routes to tools for calendar, email, and web search — replying by text or audio. | n8n · GPT-4o · Telegram · Whisper |
+
+> 🎥 Short demo videos for each workflow are on the way — to be added in one pass once all builds are complete.
 
 ---
 

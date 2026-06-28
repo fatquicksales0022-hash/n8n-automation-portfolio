@@ -20,6 +20,20 @@ Build 4 of a six-build AI automation portfolio.
 
 ---
 
+## Why this exists
+
+**The problem —** support teams answer the same handful of questions over and over,
+and the obvious fix — a chatbot — usually makes things *worse*: generic bots confidently
+make up answers that aren't in your actual docs, which erodes trust and creates support
+tickets instead of closing them.
+
+**The result —** a bot that answers **only** from your real documentation, **cites the
+source file** on every reply, and flatly **refuses to guess** when something isn't
+covered (offering a human handoff instead). Drop a file into a Google Drive folder and
+it's searchable within the poll interval — the knowledge base maintains itself.
+
+---
+
 ## What it does
 
 - **Auto-syncs a knowledge base** from a Google Drive folder on a schedule.
@@ -156,6 +170,22 @@ The third one is the point: a support bot that **won't make things up**.
 - **Grounding is a safety feature.** The agent answers only from retrieved docs
   and escalates otherwise — it can't leak or invent information that isn't in your
   knowledge base.
+
+---
+
+## Results & highlights
+
+- **Zero hallucination on out-of-scope questions** — grounding is enforced; the bot
+  cites its source file or refuses and escalates (see the screenshots above).
+- **Self-maintaining knowledge base** — a Drive folder is the single source of truth;
+  add, edit, or delete a doc and the next sync reflects it, with no duplicate chunks.
+- **Deflects repetitive tickets** — the common "where's my order / how do I reset X"
+  questions get instant, accurate, sourced answers without a human in the loop.
+- **Portable pattern** — same two-pipeline RAG design works for any document corpus
+  (HR policies, product docs, an internal wiki) by pointing it at a different folder.
+
+> 🎥 A short demo video is coming once all six builds are complete. *(Static screenshots
+> of grounded answers are already included above.)*
 
 ---
 

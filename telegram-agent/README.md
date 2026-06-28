@@ -8,6 +8,19 @@ multi-tool function calling with persistent memory.
 
 ---
 
+## 💡 Why This Exists
+
+**The problem —** quick tasks (check the calendar, fire off an email, look something
+up) are annoying to do from your phone, and typing them out is slower than just
+*saying* them — especially on the move.
+
+**The result —** a personal assistant that lives in Telegram and takes **voice or
+text**. Send a voice note, it transcribes it with Whisper, figures out which tool to
+call, does the work, and replies — by text or generated audio — all from a chat you
+already have open.
+
+---
+
 ## 🧠 What It Does
 
 - Accepts **text and voice messages** from Telegram
@@ -50,7 +63,19 @@ multi-tool function calling with persistent memory.
 
 ---
 
+## ✨ Results & Highlights
+
+- **Voice-first** — speak instead of type; Whisper transcription makes it hands-friendly.
+- **One agent, many tools** — calendar, email, and web search behind a single chat, with
+  the agent routing each request to the right sub-workflow itself.
+- **Replies in kind** — answers by text or generated audio, right inside Telegram.
+- **Persistent memory** — follow-up messages resolve against the running conversation.
+
+> 🎥 A short demo video is coming once all six builds are complete.
+
+---
+
 ## 👤 Author
 
 **Patrick Sales** — Senior Automation & AI Engineer  
-[LinkedIn](#) | [GitHub](#)
+[LinkedIn](https://www.linkedin.com/in/patrickomarsales/) | [GitHub](https://github.com/fatquicksales0022-hash)

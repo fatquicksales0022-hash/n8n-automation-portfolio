@@ -1,0 +1,13 @@
+# GitHub language stats overrides.
+# This repo is an n8n automation portfolio: the real content is workflow exports
+# (JSON) plus SQL helpers and Markdown docs. Without these overrides GitHub counts
+# only the .sql files and mislabels the whole repo as "PLpgSQL 100%".
+
+# Count the n8n workflow exports — that's what the repo actually is.
+*.json linguist-language=JSON linguist-detectable=true
+
+# Keep the SQL helper/schema files out of the language bar.
+*.sql linguist-detectable=false linguist-documentation
+
+# Diagrams and generated assets shouldn't count as code.
+*.svg linguist-vendored

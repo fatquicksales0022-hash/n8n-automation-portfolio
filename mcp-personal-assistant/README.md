@@ -10,6 +10,18 @@ portfolio.
 
 ---
 
+## Why this exists
+
+**The problem —** a normal day is scattered across apps: check the calendar here,
+draft an email there, jot a note somewhere else, run a quick search, do some math.
+Every switch breaks focus, and most "assistants" only do one of those jobs.
+
+**The result —** one chat window that does all of it. You ask in plain English and
+the agent picks the right tool itself — no menus, no hard-coded routing — and it
+asks before doing anything irreversible (sending mail, creating events).
+
+---
+
 ## What it does
 
 You chat with one assistant. Depending on what you ask, it transparently:
@@ -136,6 +148,19 @@ Email me a one-line reminder to buy milk.    ← asks you to confirm before send
   can be set to no-auth for local development — but since its tools can send email and
   write calendar events, set **Authentication → Bearer Auth** on the trigger (and match
   the token in every client) before sharing the endpoint.
+
+---
+
+## Results & highlights
+
+- **One agent, 8 tools** spanning calendar, email, sheets, notes, web search, and math
+  — chosen automatically by description-driven routing, with zero `Switch`/`if` logic.
+- **Reusable toolbox** — the MCP server is a standalone endpoint, so the same 8 tools
+  are already callable from Claude Desktop and Cursor, not just this assistant.
+- **Safe by default** — every irreversible action (send email, create event) is gated
+  behind an explicit confirmation, and the conversation is remembered across turns.
+
+> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 

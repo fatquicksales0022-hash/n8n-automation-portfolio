@@ -14,6 +14,19 @@ Build 2 of a six-build AI automation portfolio.
 
 ---
 
+## Why this exists
+
+**The problem —** keeping tabs on competitors means manually checking a dozen blogs,
+news feeds, and channels — it's tedious, easy to forget, and you still miss things.
+Purpose-built tools (Crayon, Klue, Kompyte) solve it but cost hundreds a month.
+
+**The result —** an always-on tracker that watches the whole list daily, uses AI to
+surface **only what actually changed**, and drops a sectioned weekly brief into email
+and Slack. A content-hash diff means the AI only runs on real changes, so daily
+monitoring costs cents — and one pipeline covers `[N]` competitors across 3 businesses.
+
+---
+
 ## What it does
 
 - **Crawls** a watch-list of competitors daily (RSS, Google News, YouTube feeds).
@@ -129,6 +142,20 @@ Summarize what changed across all brands this week.
 - **Competitor lists live in the database, not the workflows** — so the exported
   JSON reveals no business data. The example schema seeds generic competitors
   (TechCrunch / The Verge) and generic brand names (Brand A/B/C).
+
+---
+
+## Results & highlights
+
+- **Replaces a $100s/month SaaS category** (Crayon/Klue/Kompyte) with a workflow you own.
+- **Cheap to run daily** — the hash-diff skips the LLM on unchanged pages, so the AI
+  cost scales with *real changes*, not with how often you check.
+- **Multi-tenant** — one pipeline serves 3 separate businesses, each tagged by `brand`,
+  with the weekly brief auto-sectioned per business.
+- **Two ways to consume it** — a scheduled written brief *and* a RAG chat you can
+  interrogate ("which competitor changed pricing this month?").
+
+> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 
