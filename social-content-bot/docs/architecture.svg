@@ -1,0 +1,83 @@
+<svg viewBox="0 0 980 520" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowG" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrowR" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="968" height="508" rx="16" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="490" y="42" text-anchor="middle" font-size="23" font-weight="700" fill="#0f172a">Social Media Content Bot</text>
+  <text x="490" y="66" text-anchor="middle" font-size="13" fill="#64748b">One idea → platform-tailored posts → AI self-critique → human approval → publish</text>
+
+  <!-- ===================== GENERATE PANEL ===================== -->
+  <rect x="34" y="92" width="912" height="150" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="54" y="116" font-size="12" font-weight="700" fill="#2563eb" letter-spacing="1">GENERATE  ·  scheduled  ·  reads the queue</text>
+
+  <g font-size="11" fill="#1e3a8a" text-anchor="middle">
+    <rect x="54"  y="140" width="120" height="60" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="114" y="166">Schedule</text><text x="114" y="183" font-size="9" fill="#64748b">cron 9am MWF</text>
+
+    <rect x="206" y="140" width="140" height="60" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="276" y="162">Google Sheets</text><text x="276" y="178" font-size="9" fill="#64748b">Get first row</text><text x="276" y="190" font-size="9" fill="#64748b">status = todo</text>
+
+    <rect x="378" y="140" width="160" height="60" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="458" y="160">Generate (LLM)</text><text x="458" y="176" font-size="9" fill="#64748b">gpt-4o-mini +</text><text x="458" y="188" font-size="9" fill="#64748b">Structured Output Parser</text>
+
+    <rect x="570" y="140" width="160" height="60" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="650" y="160">Critique + Revise</text><text x="650" y="176" font-size="9" fill="#64748b">gpt-4o-mini self-edit</text><text x="650" y="188" font-size="9" fill="#64748b">same JSON shape</text>
+
+    <rect x="762" y="140" width="160" height="60" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="842" y="160">linkedin / x /</text><text x="842" y="176">instagram</text><text x="842" y="190" font-size="9" fill="#64748b">typed JSON object</text>
+  </g>
+  <g stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <line x1="174" y1="170" x2="204" y2="170"/>
+    <line x1="346" y1="170" x2="376" y2="170"/>
+    <line x1="538" y1="170" x2="568" y2="170"/>
+    <line x1="730" y1="170" x2="760" y2="170"/>
+  </g>
+
+  <!-- ===================== APPROVAL + PUBLISH PANEL ===================== -->
+  <rect x="34" y="262" width="912" height="186" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+  <text x="54" y="286" font-size="12" font-weight="700" fill="#16a34a" letter-spacing="1">APPROVE &amp; PUBLISH  ·  human in the loop</text>
+
+  <g font-size="11" fill="#14532d" text-anchor="middle">
+    <rect x="54"  y="312" width="170" height="70" rx="8" fill="#ffffff" stroke="#86efac"/>
+    <text x="139" y="336" font-weight="700">Slack: Send &amp; Wait</text><text x="139" y="354" font-size="9" fill="#64748b">workflow PAUSES here</text><text x="139" y="368" font-size="9" fill="#64748b">Approve / Decline buttons</text>
+
+    <rect x="262" y="320" width="100" height="54" rx="8" fill="#ffffff" stroke="#86efac"/>
+    <text x="312" y="343">IF</text><text x="312" y="360" font-size="9" fill="#64748b">approved?</text>
+
+    <rect x="404" y="312" width="170" height="70" rx="8" fill="#ffffff" stroke="#86efac"/>
+    <text x="489" y="336">HTTP → Ayrshare</text><text x="489" y="354" font-size="9" fill="#64748b">POST /api/post</text><text x="489" y="368" font-size="9" fill="#64748b">publish to LinkedIn</text>
+
+    <rect x="612" y="312" width="170" height="70" rx="8" fill="#ffffff" stroke="#86efac"/>
+    <text x="697" y="336">Google Sheets</text><text x="697" y="354" font-size="9" fill="#64748b">status = posted,</text><text x="697" y="368" font-size="9" fill="#64748b">posted_at + linkedin_url</text>
+
+    <rect x="822" y="320" width="100" height="54" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="872" y="343" fill="#991b1b">Decline</text><text x="872" y="360" font-size="9" fill="#b91c1c">nothing posted</text>
+  </g>
+
+  <!-- approval flow arrows -->
+  <g stroke="#16a34a" stroke-width="1.5" fill="none" marker-end="url(#arrowG)">
+    <line x1="224" y1="347" x2="260" y2="347"/>
+    <line x1="362" y1="340" x2="402" y2="340"/>
+    <line x1="574" y1="347" x2="610" y2="347"/>
+  </g>
+  <text x="384" y="332" font-size="9" fill="#16a34a" font-weight="700">true</text>
+  <!-- decline branch -->
+  <path d="M312 374 L312 410 L872 410 L872 376" stroke="#dc2626" stroke-width="1.5" fill="none" marker-end="url(#arrowR)"/>
+  <text x="328" y="406" font-size="9" fill="#dc2626" font-weight="700">false</text>
+
+  <!-- connector from generate output down to slack -->
+  <path d="M842 200 L842 224 L139 224 L139 310" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- ===================== SHEET store note ===================== -->
+  <text x="490" y="478" text-anchor="middle" font-size="11" fill="#64748b">Google Sheet <tspan font-weight="700" fill="#0f172a">content_calendar</tspan> is the queue: idea · status · posted_at · linkedin_url  —  read at the start, written back at the end</text>
+  <text x="490" y="498" text-anchor="middle" font-size="10" fill="#94a3b8">Stack: n8n · OpenAI gpt-4o-mini · Google Sheets · Slack · Ayrshare</text>
+</svg>
