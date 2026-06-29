@@ -64,6 +64,22 @@ Single workflow. Real Gmail in, real Gmail/Slack actions out, two gpt-4o-mini ca
 
 ---
 
+## Screenshots
+
+**The workflow** — Gmail Trigger → Normalize → classify → Switch fan-out → six branches, each ending in a `triaged` label:
+
+![Workflow canvas](docs/workflow-canvas.png)
+
+**The drafted reply** — a real "pricing question" was classified `needs_reply` and a reply was written to **Drafts** for review. Note it refuses to invent facts: **`[insert price]`** and **`[confirm: is onboarding included?]`** are placeholders for a human to fill, never made-up commitments:
+
+![AI-drafted reply in Gmail](docs/draft-reply.png)
+
+**The triaged loop** — every handled email is tagged `triaged`, so the `is:unread -label:triaged` trigger never reprocesses it (here: the drafted pricing email + a newsletter that was marked read):
+
+![Triaged label view](docs/triaged-inbox.png)
+
+---
+
 ## How it works (node by node)
 
 | Stage | Node | What it does |
