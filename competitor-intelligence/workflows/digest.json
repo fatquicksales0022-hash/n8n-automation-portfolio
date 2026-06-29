@@ -128,7 +128,7 @@
       ],
       "id": "f981db35-8b17-434e-aeb5-8ce801b0b52a",
       "name": "Send a message",
-      "webhookId": "492fc44e-169e-4969-9b68-cf7e016d66fa",
+      "webhookId": "49c4047a-c1cb-4ca7-b0ac-483024834e9e",
       "credentials": {
         "gmailOAuth2": {
           "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
@@ -157,7 +157,7 @@
       ],
       "id": "703cb9d4-546b-45a9-89b0-ba40086c4833",
       "name": "Send a message1",
-      "webhookId": "8ff94ef1-b8ce-4c66-8ae0-60f7e2f95908",
+      "webhookId": "9816d900-e852-4071-83db-6ae37045d2bd",
       "credentials": {
         "slackOAuth2Api": {
           "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
