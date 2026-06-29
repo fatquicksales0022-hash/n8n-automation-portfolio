@@ -1,0 +1,116 @@
+<svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
+  <text x="500" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">AI Email Triage — n8n + OpenAI</text>
+  <text x="500" y="56" text-anchor="middle" font-size="13" fill="#64748b">Gmail → classify → route → act → tag triaged</text>
+
+  <!-- Pipeline row -->
+  <g font-size="12.5" fill="#0f172a">
+    <!-- Gmail Trigger -->
+    <rect x="30" y="90" width="150" height="58" rx="9" fill="#fef2f2" stroke="#ef4444"/>
+    <text x="105" y="114" text-anchor="middle" font-weight="700">Gmail Trigger</text>
+    <text x="105" y="132" text-anchor="middle" font-size="11" fill="#64748b">is:unread -label:triaged</text>
+
+    <!-- Normalize -->
+    <rect x="210" y="90" width="135" height="58" rx="9" fill="#f1f5f9" stroke="#94a3b8"/>
+    <text x="277" y="114" text-anchor="middle" font-weight="700">Normalize</text>
+    <text x="277" y="132" text-anchor="middle" font-size="11" fill="#64748b">from · subject · ids</text>
+
+    <!-- Classifier -->
+    <rect x="375" y="90" width="160" height="58" rx="9" fill="#ecfdf5" stroke="#10b981"/>
+    <text x="455" y="111" text-anchor="middle" font-weight="700">Information Extractor</text>
+    <text x="455" y="129" text-anchor="middle" font-size="11" fill="#64748b">gpt-4o-mini → JSON</text>
+
+    <!-- Switch -->
+    <rect x="565" y="90" width="120" height="58" rx="9" fill="#eff6ff" stroke="#3b82f6"/>
+    <text x="625" y="114" text-anchor="middle" font-weight="700">Switch</text>
+    <text x="625" y="132" text-anchor="middle" font-size="11" fill="#64748b">on category</text>
+  </g>
+
+  <line x1="180" y1="119" x2="208" y2="119" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="345" y1="119" x2="373" y2="119" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="535" y1="119" x2="563" y2="119" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Branches -->
+  <g font-size="12" fill="#0f172a">
+    <!-- rows -->
+    <!-- urgent -->
+    <rect x="740" y="92" width="100" height="34" rx="7" fill="#fff7ed" stroke="#f97316"/>
+    <text x="790" y="113" text-anchor="middle" font-weight="700" font-size="11.5">urgent</text>
+    <rect x="858" y="92" width="118" height="34" rx="7" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="917" y="108" text-anchor="middle" font-size="10.5">Slack alert +</text>
+    <text x="917" y="121" text-anchor="middle" font-size="10.5">label "Urgent"</text>
+
+    <!-- needs_reply -->
+    <rect x="740" y="134" width="100" height="34" rx="7" fill="#eef2ff" stroke="#6366f1"/>
+    <text x="790" y="155" text-anchor="middle" font-weight="700" font-size="11.5">needs_reply</text>
+    <rect x="858" y="134" width="118" height="34" rx="7" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="917" y="150" text-anchor="middle" font-size="10.5">gpt-4o-mini draft</text>
+    <text x="917" y="163" text-anchor="middle" font-size="10.5">→ Gmail draft</text>
+
+    <!-- sales_lead -->
+    <rect x="740" y="176" width="100" height="34" rx="7" fill="#f0fdf4" stroke="#22c55e"/>
+    <text x="790" y="197" text-anchor="middle" font-weight="700" font-size="11.5">sales_lead</text>
+    <rect x="858" y="176" width="118" height="34" rx="7" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="917" y="197" text-anchor="middle" font-size="10.5">Slack "new lead"</text>
+
+    <!-- newsletter -->
+    <rect x="740" y="218" width="100" height="34" rx="7" fill="#f5f3ff" stroke="#8b5cf6"/>
+    <text x="790" y="239" text-anchor="middle" font-weight="700" font-size="11.5">newsletter</text>
+    <rect x="858" y="218" width="118" height="34" rx="7" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="917" y="239" text-anchor="middle" font-size="10.5">mark as read</text>
+
+    <!-- spam -->
+    <rect x="740" y="260" width="100" height="34" rx="7" fill="#fef2f2" stroke="#ef4444"/>
+    <text x="790" y="281" text-anchor="middle" font-weight="700" font-size="11.5">spam</text>
+    <rect x="858" y="260" width="118" height="34" rx="7" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="917" y="281" text-anchor="middle" font-size="10.5">trash</text>
+
+    <!-- support -->
+    <rect x="740" y="302" width="100" height="34" rx="7" fill="#f8fafc" stroke="#94a3b8"/>
+    <text x="790" y="323" text-anchor="middle" font-weight="700" font-size="11.5">support</text>
+    <rect x="858" y="302" width="118" height="34" rx="7" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="917" y="323" text-anchor="middle" font-size="10.5">(fallback) tag only</text>
+  </g>
+
+  <!-- switch to branch connectors -->
+  <g stroke="#94a3b8" stroke-width="1.3" fill="none">
+    <path d="M685 119 C 712 119, 712 109, 738 109" marker-end="url(#arrow)"/>
+    <path d="M685 119 C 712 119, 712 151, 738 151" marker-end="url(#arrow)"/>
+    <path d="M685 119 C 712 119, 712 193, 738 193" marker-end="url(#arrow)"/>
+    <path d="M685 119 C 712 119, 712 235, 738 235" marker-end="url(#arrow)"/>
+    <path d="M685 119 C 712 119, 712 277, 738 277" marker-end="url(#arrow)"/>
+    <path d="M685 119 C 712 119, 712 319, 738 319" marker-end="url(#arrow)"/>
+  </g>
+  <line x1="840" y1="109" x2="856" y2="109" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="840" y1="151" x2="856" y2="151" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="840" y1="193" x2="856" y2="193" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="840" y1="235" x2="856" y2="235" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="840" y1="277" x2="856" y2="277" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="840" y1="319" x2="856" y2="319" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+  <!-- triaged tail -->
+  <rect x="700" y="420" width="240" height="56" rx="10" fill="#fffbeb" stroke="#f59e0b"/>
+  <text x="820" y="444" text-anchor="middle" font-weight="700" font-size="13">Add label "triaged"</text>
+  <text x="820" y="463" text-anchor="middle" font-size="11" fill="#64748b">every branch → drops mail out of the trigger filter</text>
+
+  <g stroke="#f59e0b" stroke-width="1.2" fill="none" stroke-dasharray="4 3">
+    <path d="M917 126 C 917 380, 820 360, 820 418" marker-end="url(#arrow)"/>
+    <path d="M917 168 C 917 380, 820 360, 820 418"/>
+    <path d="M917 210 C 917 380, 820 360, 820 418"/>
+    <path d="M917 252 C 917 380, 820 360, 820 418"/>
+    <path d="M917 336 C 917 380, 820 360, 820 418"/>
+  </g>
+
+  <text x="30" y="450" font-size="12.5" fill="#0f172a" font-weight="700">The triaged loop</text>
+  <text x="30" y="470" font-size="11.5" fill="#64748b">Every action ends by tagging the email `triaged`, so the</text>
+  <text x="30" y="486" font-size="11.5" fill="#64748b">`is:unread -label:triaged` trigger never reprocesses it.</text>
+  <text x="30" y="502" font-size="11.5" fill="#64748b">spam is trashed instead (leaves the inbox entirely).</text>
+
+  <text x="500" y="540" text-anchor="middle" font-size="11" fill="#94a3b8">Single workflow · gpt-4o-mini · Gmail · Slack · n8n</text>
+</svg>

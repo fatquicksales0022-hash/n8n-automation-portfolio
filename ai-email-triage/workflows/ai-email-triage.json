@@ -1,0 +1,757 @@
+{
+  "name": "Build 6 - AI Email Triage",
+  "nodes": [
+    {
+      "parameters": {
+        "text": "=From: {{ $json.from }}\\nSubject: {{ $json.subject }}\\nBody: {{ $json.bodyTrimmed }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "category",
+              "description": " enum: urgent, needs_reply, sales_lead, newsletter, spam, support"
+            },
+            {
+              "name": "priority",
+              "description": "enum: high, medium, low"
+            },
+            {
+              "name": "requires_reply",
+              "type": "boolean",
+              "description": "true if a real human clearly expects a response; false for automated/promotional mail"
+            },
+            {
+              "name": "sentiment",
+              "description": "enum: positive, neutral, negative"
+            },
+            {
+              "name": "summary",
+              "description": "One neutral sentence summarizing the email. Do not invent facts not in the email."
+            },
+            {
+              "name": "suggested_action",
+              "description": "A short suggested next action for handling this email"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an email triage classifier for a busy professional's inbox.\nRead the email and return ONLY the structured fields.\n\nRules:\n- category is the single best fit. If a real human clearly expects a\n  response, prefer needs_reply over support/sales_lead.\n- urgent = time-sensitive AND from a real person (deadlines, outages,\n  an upset customer). Marketing \"urgent!\" subject lines are NOT urgent.\n- spam/newsletter = automated, promotional, or no-reply senders.\n- summary is one neutral sentence. Do not invent facts not in the email.\n- If the email is ambiguous, choose the lower-risk category and set\n  priority to medium."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "c351bee2-dc28-4edd-8262-570465b5a033",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        208
+      ],
+      "id": "25d66a4a-f91c-4930-82f1-a6db678dfd58",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "urgent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ed58c9c6-f3f0-45d4-95c1-00c6dafb3e0a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "urgent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3e14815c-ac2d-41cc-a77b-109848fea2a7",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "needs_reply",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "needs_reply"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c2460b00-cd29-4973-82fc-8564df097eff",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "sales_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sales_lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3d7b04ec-9421-45c4-88ae-01cefa44a7d3",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "newsletter",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "newsletter"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cbe52dd2-fadd-42c3-b19c-ee783af29ef6",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "spam"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "5a2c0dae-7eb8-4417-94a3-7ee72fbba18c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel"
+        },
+        "text": "=🚨 Urgent email from {{ $('Normalize').first().json.from }}\nSubject: {{ $('Normalize').first().json.subject }}\nSummary: {{ $json.output.summary }}\nSuggested action: {{ $json.output.suggested_action }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        1184,
+        -416
+      ],
+      "id": "01726be5-21b2-43eb-89d5-33309190e669",
+      "name": "Send a message",
+      "webhookId": "73c85893-1721-487b-82c0-746b21e4276e",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4db2eb21-4798-4370-9d0e-7f7d6e89539d",
+              "name": "from",
+              "value": "={{ $json.From }}",
+              "type": "string"
+            },
+            {
+              "id": "35c002fa-ba57-43b2-9e0a-0b293516e941",
+              "name": "subject",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "570e6abb-a3b4-4773-9738-582cc3a09c6e",
+              "name": "bodyTrimmed",
+              "value": "={{ ($json.text || $json.snippet).slice(0, 4000) }}",
+              "type": "string"
+            },
+            {
+              "id": "b4648473-fe86-4fb6-aaf6-fd7740039aeb",
+              "name": "threadId",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "bd0a89ac-ec52-4e71-9c0a-ab1aaa95aff7",
+              "name": "messageId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e098e854-3b64-4a30-9302-26dfdb6c559e",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Conversation so far: (none yet)\nLatest email to answer:\nFrom: {{ $('Normalize').first().json.from }}\nSubject: {{ $('Normalize').first().json.subject }}\nBody: {{ $('Normalize').first().json.bodyTrimmed }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are drafting a reply on behalf of Patrick.\n\nWrite a reply to the email below. Constraints:\n- Match the sender's tone; default to warm but concise (3-6 sentences).\n- Address every question or request explicitly.\n- Do NOT invent commitments, prices, dates, or facts. If information is\n  missing, write a placeholder in [brackets] for the user to fill.\n- End with the signature: \"Patrick\".\n- Output only the email body — no subject line, no preamble.\n\n- For any yes/no question about features, pricing, or policies, do NOT assume the answer. Use a placeholder like \"[confirm: is onboarding included?]\" unless the answer is stated in the email."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1200,
+        -208
+      ],
+      "id": "6605592b-7916-4de2-8830-8982f648183f",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1008,
+        -160
+      ],
+      "id": "8fd41fc6-51e2-4266-918f-3e178a61712b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "maxResults": 1,
+        "filters": {
+          "q": "is:unread -label:triaged"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "21f46fa7-57c8-49d6-9c67-bba651c15c83",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Normalize').first().json.messageId }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        80
+      ],
+      "id": "80cd794a-0c5c-4904-9569-13299ad54464",
+      "name": "Mark a message as read",
+      "webhookId": "e2d043ad-53ee-4962-99c1-abafab648165",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_TRIAGED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        80
+      ],
+      "id": "26ee4321-6b68-4839-8022-b5cc88737f55",
+      "name": "Add label to message",
+      "webhookId": "cb3ffca6-3ffb-4fca-ad7c-d17d0dbed8ac",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "messageId": "={{ $('Normalize').first().json.messageId }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        224
+      ],
+      "id": "bc05b3b3-e004-4228-830c-d3fadb24a638",
+      "name": "Delete a message",
+      "webhookId": "87abd1fc-0b37-430d-abed-74c142b7646f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_URGENT_LABEL_ID",
+          "YOUR_TRIAGED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        -416
+      ],
+      "id": "3c9c4962-c18c-4b87-8e47-7ae2da74dbaf",
+      "name": "Add label to message1",
+      "webhookId": "e45ea161-c2e0-4441-a403-1a3190cf1645",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: {{ $('Normalize').first().json.subject }}",
+        "message": "={{ $json.text }}",
+        "options": {
+          "threadId": "={{ $('Normalize').first().json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        -224
+      ],
+      "id": "6be4d62d-d2c8-4f8e-a296-88075d2fa75e",
+      "name": "Create a draft",
+      "webhookId": "c4e385d2-0db7-41bf-ae9c-ef56b14e0a2c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_TRIAGED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        -224
+      ],
+      "id": "14aa9fbe-d350-4c7d-955f-ebd33702c5a3",
+      "name": "Add label to message2",
+      "webhookId": "bf13b1ec-72d9-4ae5-b570-c0c29ed303c0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel"
+        },
+        "text": "=💰 New sales lead from {{ $('Normalize').first().json.from }} — {{ $json.output.summary }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        1328,
+        -80
+      ],
+      "id": "f6ef77c8-8bdf-44b2-9f33-842ec3fdb44b",
+      "name": "Send a message1",
+      "webhookId": "2763373d-5972-432c-ba8f-4f490eb6d408",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_TRIAGED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        -80
+      ],
+      "id": "109a8006-432c-424b-a1a7-9422c4e3a9c6",
+      "name": "Add label to message3",
+      "webhookId": "2b55e7b4-fbd6-4867-8f52-03742d8828ae",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_TRIAGED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        400
+      ],
+      "id": "b100381c-3b98-43b7-b0c1-39c5ea636ddc",
+      "name": "Add label to message4",
+      "webhookId": "db058d06-cebe-45c6-b6fc-3e03a76e9994",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark a message as read": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Add label to message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Add label to message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": []
+}
