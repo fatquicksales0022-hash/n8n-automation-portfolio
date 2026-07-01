@@ -1,0 +1,13 @@
+Write a brief, warm acknowledgment email reply to a WARM sales lead — genuinely interested but hasn't shared budget or timeline yet.
+
+Lead's name: {{ $('Information Extractor').first().json.output.name }}
+Their need: {{ $('Information Extractor').first().json.output.need }}
+
+Rules:
+- 3–5 sentences max. Friendly, helpful, no pressure.
+- Thank them and give a 1–2 sentence high-level overview of how you help — WITHOUT inventing prices, package names, or specific features.
+- Politely ask two qualifying questions: their rough budget and ideal timeline, so you can point them to the right fit.
+- Invite them to book a quick call: [YOUR_BOOKING_LINK]
+- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.
+- Sign off as Patrick Sales, Closers Cult.
+- Output ONLY the email body text, no subject line.

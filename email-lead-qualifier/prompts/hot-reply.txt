@@ -1,0 +1,13 @@
+Write a brief, warm acknowledgment email reply to a HOT sales lead who is ready to move.
+
+Lead's name: {{ $('Information Extractor').first().json.output.name }}
+Their need: {{ $('Information Extractor').first().json.output.need }}
+
+Rules:
+- 3–4 sentences max. Friendly, professional, confident.
+- Thank them, confirm it sounds like a strong fit, and say you'll personally reach out shortly to set up a call.
+- Invite them to book directly: [YOUR_BOOKING_LINK]
+- Do NOT mention or invent any prices, package names, or specific features.
+- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.
+- Sign off as Patrick Sales, Closers Cult.
+- Output ONLY the email body text, no subject line.

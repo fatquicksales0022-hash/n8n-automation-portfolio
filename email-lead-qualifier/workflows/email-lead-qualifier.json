@@ -1,0 +1,1099 @@
+{
+  "name": "Build 7 - email-lead-qualifier",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "maxResults": 1,
+        "filters": {
+          "q": "is:unread -label:qualified"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "34ee7218-4591-4176-ac6a-aaa990f37812",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76674cce-7d09-40bb-ac75-3c50de17fdeb",
+              "name": "fromEmail",
+              "value": "={{ $('Gmail Trigger').item.json.From.match(/<(.+?)>/) ? $('Gmail Trigger').item.json.From.match(/<(.+?)>/)[1] : $('Gmail Trigger').item.json.From }}",
+              "type": "string"
+            },
+            {
+              "id": "87066bf5-f0db-4000-a769-bd6167d43f80",
+              "name": "fromRaw",
+              "value": "={{ $('Gmail Trigger').item.json.From }}",
+              "type": "string"
+            },
+            {
+              "id": "e89a46c3-b39d-4a3f-a314-e01a13363f75",
+              "name": "subject",
+              "value": "={{ $('Gmail Trigger').item.json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "c529cfbb-afa2-421a-bd4a-5cdbb1bf241b",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "8478c8ad-20c8-426a-a98d-541200246310",
+              "name": "messageId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "395dc45a-d192-4ee3-ae67-03cd7aba9f6c",
+              "name": "body",
+              "value": "={{ ($('Get a message').item.json.text || $('Get a message').item.json.html || $('Gmail Trigger').item.json.snippet).slice(0, 4000) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "78819849-3a28-4286-8195-7036fa61a8da",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "text": "=Subject: {{ $json.subject }}\n\nFrom: {{ $json.fromRaw }}\n\n{{ $json.body }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "is_lead",
+              "type": "boolean",
+              "description": "true if a genuine sales/business inquiry; false if spam, newsletter, job app, or vendor pitch"
+            },
+            {
+              "name": "name",
+              "description": "sender's full name, or \"unknown\""
+            },
+            {
+              "name": "company",
+              "description": "sender's company, or \"unknown\""
+            },
+            {
+              "name": "budget",
+              "description": "stated budget, or \"unknown\""
+            },
+            {
+              "name": "authority",
+              "description": "sender's decision-making role, or \"unknown\""
+            },
+            {
+              "name": "need",
+              "description": "the problem/need they described"
+            },
+            {
+              "name": "timeline",
+              "description": "when they want to start, or \"unknown\""
+            },
+            {
+              "name": "score",
+              "type": "number",
+              "description": "BANT fit, 0–100"
+            },
+            {
+              "name": "stage",
+              "description": "exactly one of: qualified, not_qualified, unclear"
+            },
+            {
+              "name": "summary",
+              "description": "one-sentence summary of the lead"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=You are a B2B sales lead qualifier. Read the inbound email and assess it with the BANT framework (Budget, Authority, Need, Timeline). Extract the sender's details and score the lead 0–100.\n\nScoring (25 points each):\n- Budget: a clear, sufficient budget is stated = full; vague/partial = some; none = 0.\n- Authority: sender is a decision-maker (founder, owner, C-level, \"my call to make\") = full; influencer = partial; unknown = 0.\n- Need: a clear, specific problem your service solves = full; vague curiosity = partial.\n- Timeline: wants to act soon (within ~1 month) = full; later = partial; none = 0.\n\nSet stage:\n- \"qualified\"      -> is_lead is true AND score >= 60\n- \"unclear\"        -> a real inquiry but too little info (score 30–59)\n- \"not_qualified\"  -> not a genuine buying inquiry (spam, newsletter, job application, vendor pitch) or very low score\n\nis_lead = true ONLY for genuine business/sales inquiries.\nFor any field the email does not state, return the literal string \"unknown\" — never invent a value, and never output the word \"undefined\".\nsummary = one short sentence."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "7152f290-164c-4888-a12c-f38495215229",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        208
+      ],
+      "id": "8befd29e-e8da-4df4-b5e6-384bc9040217",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "188a0028-b6d8-4e32-8173-9ebe2d58b103",
+      "name": "Get a message",
+      "webhookId": "e9cdbd9e-bf37-4bfb-82c7-d2180bcdac6e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO email_leads (email, name, company, budget, authority, need, timeline, score, stage, summary, subject, updated_at)\nVALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, now())\nON CONFLICT (email) DO UPDATE SET\n  name=COALESCE(NULLIF(EXCLUDED.name,''),email_leads.name),\n  company=COALESCE(NULLIF(EXCLUDED.company,''),email_leads.company),\n  budget=COALESCE(NULLIF(EXCLUDED.budget,''),email_leads.budget),\n  authority=COALESCE(NULLIF(EXCLUDED.authority,''),email_leads.authority),\n  need=COALESCE(NULLIF(EXCLUDED.need,''),email_leads.need),\n  timeline=COALESCE(NULLIF(EXCLUDED.timeline,''),email_leads.timeline),\n  score=EXCLUDED.score, stage=EXCLUDED.stage,\n  summary=EXCLUDED.summary, subject=EXCLUDED.subject, updated_at=now();",
+        "options": {
+          "queryReplacement": "={{ [ $('Normalize').first().json.fromEmail, $json.output.name, $json.output.company, $json.output.budget, $json.output.authority, $json.output.need, $json.output.timeline, $json.output.score, $json.output.stage, $json.output.summary, $('Normalize').first().json.subject ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1168,
+        -160
+      ],
+      "id": "6feb600e-72ca-409a-9091-958cf18f74ab",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_WITH_YOUR_POSTGRES_CREDENTIAL",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel"
+        },
+        "text": "=🔥 New qualified email lead — {{ $('Information Extractor').first().json.output.name }} ({{ $('Normalize').first().json.fromEmail }})\nCompany: {{ $('Information Extractor').first().json.output.company }}\nBudget: {{ $('Information Extractor').first().json.output.budget }} · Timeline: {{ $('Information Extractor').first().json.output.timeline }} · Score: {{ $('Information Extractor').first().json.output.score }}\nNeed: {{ $('Information Extractor').first().json.output.need }}\n\n👉 Reply now: https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        1408,
+        -160
+      ],
+      "id": "7b2e4824-bacd-4c53-a4ac-ddbaaf00af6f",
+      "name": "Send a message",
+      "webhookId": "df7dd58d-e3fc-454c-991d-4070af339e7d",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_QUALIFIED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        -160
+      ],
+      "id": "da38884d-0a97-4750-8e67-9778bc38e959",
+      "name": "Add label to message",
+      "webhookId": "7caaba12-c1ce-4c7c-880a-e9634a0a3983",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Normalize').first().json.messageId }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        192
+      ],
+      "id": "dc24a084-246b-41f5-8e4f-378d00d52a57",
+      "name": "Mark a message as read",
+      "webhookId": "b8d46687-229f-46f2-a1fa-aac9064f1d0a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.stage }}",
+                    "rightValue": "qualified",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ca3a4f4b-3b3d-4fae-844f-da7428a96b11"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0bc10bcd-db96-495e-91c6-95388ca9fe85",
+                    "leftValue": "={{ $json.output.stage }}",
+                    "rightValue": "unclear",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        0
+      ],
+      "id": "5bd125db-cefd-4c26-8449-76331ec6a6b7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO email_leads (email, name, company, budget, authority, need, timeline, score, stage, summary, subject, updated_at)\nVALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, now())\nON CONFLICT (email) DO UPDATE SET\n  name=COALESCE(NULLIF(EXCLUDED.name,''),email_leads.name),\n  company=COALESCE(NULLIF(EXCLUDED.company,''),email_leads.company),\n  budget=COALESCE(NULLIF(EXCLUDED.budget,''),email_leads.budget),\n  authority=COALESCE(NULLIF(EXCLUDED.authority,''),email_leads.authority),\n  need=COALESCE(NULLIF(EXCLUDED.need,''),email_leads.need),\n  timeline=COALESCE(NULLIF(EXCLUDED.timeline,''),email_leads.timeline),\n  score=EXCLUDED.score, stage=EXCLUDED.stage,\n  summary=EXCLUDED.summary, subject=EXCLUDED.subject, updated_at=now();",
+        "options": {
+          "queryReplacement": "={{ [ $('Normalize').first().json.fromEmail, $json.output.name, $json.output.company, $json.output.budget, $json.output.authority, $json.output.need, $json.output.timeline, $json.output.score, $json.output.stage, $json.output.summary, $('Normalize').first().json.subject ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "883dfbac-e750-44cc-8766-f3cd788ef69b",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_WITH_YOUR_POSTGRES_CREDENTIAL",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "your-channel"
+        },
+        "text": "=🔥 New qualified email lead — {{ $('Information Extractor').first().json.output.name }} ({{ $('Normalize').first().json.fromEmail }})\nCompany: {{ $('Information Extractor').first().json.output.company }}\nBudget: {{ $('Information Extractor').first().json.output.budget }} · Timeline: {{ $('Information Extractor').first().json.output.timeline }} · Score: {{ $('Information Extractor').first().json.output.score }}\nNeed: {{ $('Information Extractor').first().json.output.need }}\n\n👉 Reply now: https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        1408,
+        0
+      ],
+      "id": "cb0081ed-b2af-46b5-a791-748bc293d7d8",
+      "name": "Send a message1",
+      "webhookId": "36f3e748-8af3-4b28-be60-27b57c26432d",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "labelIds": [
+          "YOUR_QUALIFIED_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        0
+      ],
+      "id": "214bf6a7-2cb7-4174-b805-673d312cd494",
+      "name": "Add label to message1",
+      "webhookId": "c0a541ac-364e-4822-873c-de0df774d43d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a brief, warm acknowledgment email reply to a HOT sales lead who is ready to move.\n\nLead's name: {{ $('Information Extractor').first().json.output.name }}\nTheir need: {{ $('Information Extractor').first().json.output.need }}\n\nRules:\n- 3–4 sentences max. Friendly, professional, confident.\n- Thank them, confirm it sounds like a strong fit, and say you'll personally reach out shortly to set up a call.\n- Invite them to book directly: [YOUR_BOOKING_LINK]\n- Do NOT mention or invent any prices, package names, or specific features.\n- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.\n- Sign off as Patrick Sales, Closers Cult.\n- Output ONLY the email body text, no subject line.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1840,
+        -352
+      ],
+      "id": "2f2eddfe-22e7-4110-b80b-a54049e4798d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1840,
+        -160
+      ],
+      "id": "5c7d6cef-5271-4821-ba70-9e9288994d68",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a brief, warm acknowledgment email reply to a WARM sales lead — genuinely interested but hasn't shared budget or timeline yet.\n\nLead's name: {{ $('Information Extractor').first().json.output.name }}\nTheir need: {{ $('Information Extractor').first().json.output.need }}\n\nRules:\n- 3–5 sentences max. Friendly, helpful, no pressure.\n- Thank them and give a 1–2 sentence high-level overview of how you help — WITHOUT inventing prices, package names, or specific features.\n- Politely ask two qualifying questions: their rough budget and ideal timeline, so you can point them to the right fit.\n- Invite them to book a quick call: [YOUR_BOOKING_LINK]\n- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.\n- Sign off as Patrick Sales, Closers Cult.\n- Output ONLY the email body text, no subject line.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1824,
+        0
+      ],
+      "id": "75fa9cda-0c60-466c-a039-e68849d5e2e5",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1824,
+        208
+      ],
+      "id": "d9e28186-c827-4fb0-a104-790790106002",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2192,
+        -352
+      ],
+      "id": "b39eed82-f6bb-47aa-90e3-de75259a4b85",
+      "name": "Reply to a message",
+      "webhookId": "0fa9f472-ff0c-4fc8-b928-0a12a6d14878",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Normalize').first().json.messageId }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2192,
+        0
+      ],
+      "id": "098dbc2a-e522-45d7-8958-8fbe7be529fd",
+      "name": "Reply to a message1",
+      "webhookId": "f73a4692-37bb-4e28-b3f1-7ad2136a6146",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Email Lead Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.format('yyyy-LL-dd HH:mm') }}",
+            "Name": "={{ $('Information Extractor').first().json.output.name }}",
+            "Email": "={{ $('Normalize').first().json.fromEmail }}",
+            "Company": "={{ $('Information Extractor').first().json.output.company }}",
+            "Budget": "={{ $('Information Extractor').first().json.output.budget }}",
+            "Timeline": "={{ $('Information Extractor').first().json.output.timeline }}",
+            "Score": "={{ $('Information Extractor').first().json.output.score }}",
+            "Stage": "={{ $('Information Extractor').first().json.output.stage }}",
+            "Need": "={{ $('Information Extractor').first().json.output.need }}",
+            "Open Email": "=https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Need",
+              "displayName": "Need",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Open Email",
+              "displayName": "Open Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2416,
+        -352
+      ],
+      "id": "1edc129e-1560-42b3-82ec-fa7808c1252e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_GOOGLE_SHEETS_CREDENTIAL",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Email Lead Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.format('yyyy-LL-dd HH:mm') }}",
+            "Name": "={{ $('Information Extractor').first().json.output.name }}",
+            "Email": "={{ $('Normalize').first().json.fromEmail }}",
+            "Company": "={{ $('Information Extractor').first().json.output.company }}",
+            "Budget": "={{ $('Information Extractor').first().json.output.budget }}",
+            "Timeline": "={{ $('Information Extractor').first().json.output.timeline }}",
+            "Score": "={{ $('Information Extractor').first().json.output.score }}",
+            "Stage": "={{ $('Information Extractor').first().json.output.stage }}",
+            "Need": "={{ $('Information Extractor').first().json.output.need }}",
+            "Open Email": "=https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Need",
+              "displayName": "Need",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Open Email",
+              "displayName": "Open Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2416,
+        0
+      ],
+      "id": "23269af0-dfa4-455a-81e2-5434cce62546",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_GOOGLE_SHEETS_CREDENTIAL",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": []
+}
