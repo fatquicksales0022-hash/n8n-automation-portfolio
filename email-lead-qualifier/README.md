@@ -73,6 +73,15 @@ three gpt-4o-mini calls (one to score, one per lead branch to reply).
 
 ---
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+The full workflow — Gmail intake → full-body fetch → BANT scoring → the hot/warm/dismiss
+Switch → per-branch capture, alert, label, auto-reply, and tracker row.
+
+---
+
 ## How it works (node by node)
 
 | Stage | Node | What it does |
@@ -157,7 +166,7 @@ three gpt-4o-mini calls (one to score, one per lead branch to reply).
   double-handle an email.
 - **Portable** — swap the BANT rubric and reply tone to fit any services business.
 
-> 🎥 A short demo GIF is coming in the portfolio demo pass.
+> 🎥 See [`docs/demo.gif`](docs/demo.gif) for the workflow in action.
 
 ---
 
