@@ -81,6 +81,16 @@ decide whether to alert sales.
 
 ---
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+A live run, split-screen: a prospect messages in on WhatsApp while the n8n canvas
+lights up node by node — Trigger → load lead → AI Agent (qualifies + persists BANT)
+→ WhatsApp reply → stage check → IF qualified → Slack alert to sales.
+
+---
+
 ## Screenshots
 
 **The workflow** — a full run: WhatsApp Trigger → load lead → AI Agent (with `upsert_lead` tool + Postgres chat memory) → reply → check stage → IF qualified → Slack:
@@ -174,8 +184,6 @@ It qualifies turn by turn, a row fills in on the `leads` table, and once it hits
   reach sales (booking link + Slack alert), so reps stop triaging tyre-kickers.
 - **Channel-agnostic core** — built behind a Chat Trigger first, WhatsApp swapped in
   last; the same agent drops onto web chat or another channel unchanged.
-
-> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 
