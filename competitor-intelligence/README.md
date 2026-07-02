@@ -81,6 +81,15 @@ entirely — so crawling all competitors every day costs cents, not dollars.
 
 ---
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+A live chat run — a question about a competitor is answered from the intel vector
+store via the `search_intel` tool, citing the competitor, source, and date.
+
+---
+
 ## Screenshots
 
 **Crawl pipeline** — a full run: scrape → hash-diff → AI summarize → vector store + log (item counts on every node):
@@ -178,8 +187,6 @@ Summarize what changed across all brands this week.
   with the weekly brief auto-sectioned per business.
 - **Two ways to consume it** — a scheduled written brief *and* a RAG chat you can
   interrogate ("which competitor changed pricing this month?").
-
-> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 
