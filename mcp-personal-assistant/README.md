@@ -56,6 +56,16 @@ The project is **two workflows** that meet over MCP:
 same toolbox is reusable by other clients, and the assistant's front door can be
 swapped (Chat → Telegram/WhatsApp/web widget) without touching the tools.
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+A live chat run — a request routes through the AI Agent to an **MCP tool call** and
+back: the assistant saves a note, then recalls it from Supabase, with the same
+server also exposing calendar, Gmail, web search, and more.
+
+---
+
 ## Screenshots
 
 | The assistant | The MCP server (8 tools) |
@@ -159,8 +169,6 @@ Email me a one-line reminder to buy milk.    ← asks you to confirm before send
   are already callable from Claude Desktop and Cursor, not just this assistant.
 - **Safe by default** — every irreversible action (send email, create event) is gated
   behind an explicit confirmation, and the conversation is remembered across turns.
-
-> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 

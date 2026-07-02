@@ -63,6 +63,15 @@ APPROVE & PUBLISH  (human in the loop)
         └─ false → (nothing published; optionally mark status=rejected)
 ```
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+A live run — the AI drafts a post and self-critiques it, pauses for **Slack approval**,
+and on approve publishes to LinkedIn and logs the row back to the sheet.
+
+---
+
 ## Screenshots
 
 **The workflow** — Schedule → Sheets queue → generate → critique → Slack approval → IF → Ayrshare → log:
@@ -169,8 +178,6 @@ The pause is the demo: automation that knows when to stop and ask.
   link back to the live post, so the sheet doubles as a publishing record.
 - **Portable** — swap the brand-voice prompt and the connected socials and the same
   engine works for any brand or creator.
-
-> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 

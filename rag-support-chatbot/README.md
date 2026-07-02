@@ -88,6 +88,16 @@ table's `vector(1536)` dimension is tied to this model too.
 
 ---
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+A live chat run — a support question is answered strictly from the ingested docs via
+the `search_docs` vector-store tool (grounded, with the source), and an out-of-scope
+question is politely declined.
+
+---
+
 ## Screenshots
 
 **Ingestion workflow** — Schedule → wipe → Drive search → download → extract → embed → Supabase:
@@ -183,9 +193,6 @@ The third one is the point: a support bot that **won't make things up**.
   questions get instant, accurate, sourced answers without a human in the loop.
 - **Portable pattern** — same two-pipeline RAG design works for any document corpus
   (HR policies, product docs, an internal wiki) by pointing it at a different folder.
-
-> 🎥 A short demo video is coming once all six builds are complete. *(Static screenshots
-> of grounded answers are already included above.)*
 
 ---
 

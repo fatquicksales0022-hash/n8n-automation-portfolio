@@ -44,6 +44,15 @@ already have open.
 
 ![Workflow](docs/workflow.png)
 
+---
+
+## 🎬 Demo
+
+![Demo](docs/demo.gif)
+
+A live run — a Telegram message routes through the agent to the right tool
+(calendar / email / web search) and the reply lands right back in the chat.
+
 ## ⚙️ Tech Stack
 
 - **Platform:** n8n (self-hosted / cloud)
@@ -70,8 +79,6 @@ already have open.
   the agent routing each request to the right sub-workflow itself.
 - **Replies in kind** — answers by text or generated audio, right inside Telegram.
 - **Persistent memory** — follow-up messages resolve against the running conversation.
-
-> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 

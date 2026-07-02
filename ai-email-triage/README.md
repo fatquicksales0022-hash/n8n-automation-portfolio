@@ -64,6 +64,15 @@ Single workflow. Real Gmail in, real Gmail/Slack actions out, two gpt-4o-mini ca
 
 ---
 
+## Demo
+
+![Demo](docs/demo.gif)
+
+A live run — an inbound email is classified, the **Switch** routes it to the matching
+branch, and that branch acts (draft a reply / label / alert) before tagging it `triaged`.
+
+---
+
 ## Screenshots
 
 **The workflow** — Gmail Trigger → Normalize → classify → Switch fan-out → six branches, each ending in a `triaged` label:
@@ -150,8 +159,6 @@ Single workflow. Real Gmail in, real Gmail/Slack actions out, two gpt-4o-mini ca
   forces placeholders. (See [`prompts/drafting.txt`](prompts/drafting.txt).)
 - **Portable** — point it at any inbox; adjust the categories and branch actions to
   fit a support desk, a sales inbox, or a personal one.
-
-> 🎥 A short demo video is coming once all six builds are complete.
 
 ---
 
