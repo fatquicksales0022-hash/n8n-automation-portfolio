@@ -1,0 +1,151 @@
+{
+  "name": "Shared Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cd7fe24e-f4e4-408e-a4cc-c90e38d82aee",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e0635661-f358-4109-b169-dd24ea32ff23",
+              "name": "alert",
+              "value": "=🚨 *Workflow failed:* {{ $json.workflow.name }}\n\n*Node:* {{ $json.execution.lastNodeExecuted }}\n*Error:* {{ $json.execution.error.message }}\n*Time:* {{ $now.toISO() }}\n\n*Open the failed run:* {{ $json.execution.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "769f5ba5-d8a3-49c0-9bd5-55b99a7830fe",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "alerts@your-domain.com",
+        "subject": "=🚨 n8n failure: {{ $json.workflow.name }}",
+        "message": "={{ $json.alert }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "16c8f1a9-d7be-4531-9d34-2266e7f7a540",
+      "name": "Send a message",
+      "webhookId": "fb05405f-9fe6-495e-854d-28236d452e8a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dku6asR2rjX2ypmP",
+          "name": "Gmail account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🚨 Shared Error Handler — one failure notifier for every workflow\nAn Error Trigger workflow wired into every other workflow's *Settings → Error Workflow*. When any workflow fails in production, n8n routes the failure here → it formats a readable alert (which workflow, which node, the error, a deep link to the failed run) → emails it instantly. Build it once, wire it everywhere.\n**n8n · Gmail**",
+        "height": 150,
+        "width": 760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        -260
+      ],
+      "id": "13d113bc-ab72-4154-912e-af2491c96252",
+      "name": "Note 6f3c"
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Error Trigger\nFires automatically whenever another workflow that names this one as its Error Workflow fails. Receives the full failure payload: the failed workflow's name, the node that broke, the error message, and a deep link to the exact failed run.",
+        "height": 200,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        140
+      ],
+      "id": "e5f2ad83-edf5-4ba6-8bfc-58ea50d0d8e4",
+      "name": "Note a266"
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Format the alert\nA Set node collapses the raw payload into one readable block — workflow name, the failing node, the error text, timestamp, and a one-click link to the failed run. Keeps the alert human, not a JSON dump.",
+        "height": 200,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        168,
+        140
+      ],
+      "id": "67aa7009-2203-4b8b-a135-fb1b2de5c283",
+      "name": "Note 9c30"
+    },
+    {
+      "parameters": {
+        "content": "### 3 · Notify by email\nGmail sends the alert instantly, with the workflow name in the subject so failures are triageable straight from the inbox. Swap Gmail for Slack/Telegram to change channel — the rest of the chain is unchanged.",
+        "height": 200,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        376,
+        140
+      ],
+      "id": "97e54bb0-8d7f-48c7-a049-4340f415032e",
+      "name": "Note 5f78"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
