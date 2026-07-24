@@ -3,12 +3,92 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Schedule",
+        "height": 479,
+        "width": 222,
+        "color": 5
+      },
+      "id": "60140345-2064-49b2-a769-09d84f669b7f",
+      "name": "Sticky · Schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -111
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Get idea\nNext idea from the sheet.",
+        "height": 479,
+        "width": 361,
+        "color": 2
+      },
+      "id": "55b2f16c-8b11-4fa3-99cf-46ef29c0e752",
+      "name": "Sticky · Get idea",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        162,
+        -111
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Draft + self-critique\nTwo LLM passes — write, then refine for quality.",
+        "height": 479,
+        "width": 628,
+        "color": 3
+      },
+      "id": "21d8e88a-47a1-4aa0-ba5b-9819fdce1246",
+      "name": "Sticky · Draft + self-critique",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        523,
+        -111
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Human gate\nSlack Approve / Decline before anything is posted.",
+        "height": 479,
+        "width": 607,
+        "color": 6
+      },
+      "id": "5b0d5781-2440-4e2d-a71e-350c9ab6aa2b",
+      "name": "Sticky · Human gate",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1151,
+        -111
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Publish + log\nAyrshare posts it, then the live link is written back to the sheet.",
+        "height": 479,
+        "width": 449,
+        "color": 7
+      },
+      "id": "f1ee0d82-150a-444d-a956-4c9c6f31e083",
+      "name": "Sticky · Publish + log",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1758,
+        -111
+      ]
+    },
+    {
+      "parameters": {
         "promptType": "define",
         "text": "=Turn the idea below into platform-tailored posts.\n\nIdea: {{ $json.idea }}",
         "messages": {
           "messageValues": [
             {
-              "message": "=You are a social content writer building a personal brand on professional and\ncreative platforms. Voice: sharp, honest, encouraging. Audience: professionals,\njob seekers, and early-career builders.\n\nRules:\n- Lead every post with a strong first line that earns the scroll-stop.\n- Write like a real person. No hype words, no emoji spam, no \"in today's world,\"\n  no generic AI phrasing (\"unlock,\" \"leverage,\" \"game-changer,\" \"dive in\").\n- Each post must stand alone and make sense without the others.\n- No fabricated stats, quotes, or names. Specific and concrete beats vague.\n- One clear call-to-action per post.\n\nTurn the idea below into platform-tailored posts:\n- linkedin: text (<=1200 chars, professional but human, 1 CTA, 2-3 hashtags) and\n  hook (the first line on its own).\n- x: text (<=270 chars, punchy, 1-2 hashtags).\n- instagram: caption (<=300 chars, warm and personal) and hashtags (5-10 relevant tags).\nReturn ONLY valid minified JSON in exactly this shape — no markdown, no code fences, no headings, no commentary:\n{\"output\":{\"linkedin\":{\"hook\":\"\",\"text\":\"\"},\"x\":{\"text\":\"\"},\"instagram\":{\"caption\":\"\",\"hashtags\":[]}}}"
+              "message": "=You are a social content writer building a personal brand on professional and\ncreative platforms. Voice: sharp, honest, encouraging. Audience: professionals,\njob seekers, and early-career builders.\n\nRules:\n- Lead every post with a strong first line that earns the scroll-stop.\n- Write like a real person. No hype words, no emoji spam, no \"in today's world,\"\n  no generic AI phrasing (\"unlock,\" \"leverage,\" \"game-changer,\" \"dive in\").\n- Each post must stand alone and make sense without the others.\n- No fabricated stats, quotes, or names. Specific and concrete beats vague.\n- One clear call-to-action per post.\n\nTurn the idea below into platform-tailored posts:\n- linkedin: text (<=1200 chars, professional but human, 1 CTA, 2-3 hashtags) and\n  hook (the first line on its own).\n- x: text (<=270 chars, punchy, 1-2 hashtags).\n- instagram: caption (<=300 chars, warm and personal) and hashtags (5-10 relevant tags).\nReturn ONLY valid minified JSON in exactly this shape - no markdown, no code fences, no headings, no commentary:\n{\"output\":{\"linkedin\":{\"hook\":\"\",\"text\":\"\"},\"x\":{\"text\":\"\"},\"instagram\":{\"caption\":\"\",\"hashtags\":[]}}}"
             }
           ]
         },
@@ -58,7 +138,7 @@
         "messages": {
           "messageValues": [
             {
-              "message": "=You are a ruthless social media editor. You receive draft posts for LinkedIn, X,\nand Instagram. For each one, silently score it 1-10 on (a) hook strength,\n(b) clarity, (c) on-brand voice — sharp, honest, encouraging. Then rewrite each\npost to fix its single weakest dimension, while keeping that platform's length\nlimit and norms (LinkedIn <=1200, X <=270, Instagram caption <=300, 5-10 tags).\n\nDo not add fabricated stats or quotes. Return only the improved posts in the same\nJSON structure (linkedin, x, instagram). No scores, no commentary."
+              "message": "=You are a ruthless social media editor. You receive draft posts for LinkedIn, X,\nand Instagram. For each one, silently score it 1-10 on (a) hook strength,\n(b) clarity, (c) on-brand voice - sharp, honest, encouraging. Then rewrite each\npost to fix its single weakest dimension, while keeping that platform's length\nlimit and norms (LinkedIn <=1200, X <=270, Instagram caption <=300, 5-10 tags).\n\nDo not add fabricated stats or quotes. Return only the improved posts in the same\nJSON structure (linkedin, x, instagram). No scores, no commentary."
             }
           ]
         },
@@ -278,7 +358,7 @@
           "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "id"
         },
-        "message": "=*New posts ready for review*  —  idea: {{ $('Get row(s) in sheet').first().json.idea }}\n\n*LinkedIn:*\n{{ $json.output.linkedin.text }}\n\n*X:*\n{{ $json.output.x.text }}\n\n*Instagram:*\n{{ $json.output.instagram.caption }}\n{{ $json.output.instagram.hashtags.join(' ') }}",
+        "message": "=*New posts ready for review*  -  idea: {{ $('Get row(s) in sheet').first().json.idea }}\n\n*LinkedIn:*\n{{ $json.output.linkedin.text }}\n\n*X:*\n{{ $json.output.x.text }}\n\n*Instagram:*\n{{ $json.output.instagram.caption }}\n{{ $json.output.instagram.hashtags.join(' ') }}",
         "approvalOptions": {
           "values": {
             "approvalType": "double"
@@ -360,7 +440,7 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "trHSo3RUnBy8ZqXd",
-          "name": "Ayrshare Header Auth Local"
+          "name": "HubSpot Header Auth Local"
         }
       }
     },
@@ -386,7 +466,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const j = $input.item.json;\nlet obj;\nif (typeof j.text === 'string') {\n  // Cloud / string case: parse the JSON string\n  const s = j.text.replace(/```json\\s*/gi, '').replace(/```/g, '').trim();\n  obj = JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1));\n} else {\n  obj = j;                       // self-host case: already a parsed object\n}\nif (!obj.output) obj = { output: obj };   // force consistent {output:{…}} shape\nreturn { json: obj };"
+        "jsCode": "const j = $input.item.json;\nlet obj;\nif (typeof j.text === 'string') {\n  // Cloud / string case: parse the JSON string\n  const s = j.text.replace(/```json\\s*/gi, '').replace(/```/g, '').trim();\n  obj = JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1));\n} else {\n  obj = j;                       // self-host case: already a parsed object\n}\nif (!obj.output) obj = { output: obj };   // force consistent {output:{.}} shape\nreturn { json: obj };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -399,7 +479,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const j = $input.item.json;\nlet obj;\nif (typeof j.text === 'string') {\n  // Cloud / string case: parse the JSON string\n  const s = j.text.replace(/```json\\s*/gi, '').replace(/```/g, '').trim();\n  obj = JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1));\n} else {\n  obj = j;                       // self-host case: already a parsed object\n}\nif (!obj.output) obj = { output: obj };   // force consistent {output:{…}} shape\nreturn { json: obj };"
+        "jsCode": "const j = $input.item.json;\nlet obj;\nif (typeof j.text === 'string') {\n  // Cloud / string case: parse the JSON string\n  const s = j.text.replace(/```json\\s*/gi, '').replace(/```/g, '').trim();\n  obj = JSON.parse(s.slice(s.indexOf('{'), s.lastIndexOf('}') + 1));\n} else {\n  obj = j;                       // self-host case: already a parsed object\n}\nif (!obj.output) obj = { output: obj };   // force consistent {output:{.}} shape\nreturn { json: obj };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -409,86 +489,6 @@
       ],
       "id": "1815aefd-c2e6-4b7d-9b4d-f8c8d1277115",
       "name": "Normalize Final"
-    },
-    {
-      "parameters": {
-        "content": "## ✍️ Build 5 - Social Content Bot\nScheduled: AI drafts + refines social posts, logs them to Google Sheets, publishes via HTTP, and pings Slack for review.\n**OpenAI - Google Sheets - Slack - HTTP**",
-        "height": 479,
-        "width": 222,
-        "color": 7
-      },
-      "id": "5e325fda-65c1-450d-8265-5651570cfed8",
-      "name": "Sticky · Schedule",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -111
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Get idea\nNext idea from the sheet.",
-        "height": 479,
-        "width": 361,
-        "color": 2
-      },
-      "id": "fdb46b29-7909-4647-81b3-70c842d5493c",
-      "name": "Sticky · Get idea",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        162,
-        -111
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Draft + self-critique\nTwo LLM passes — write, then refine for quality.",
-        "height": 479,
-        "width": 628,
-        "color": 3
-      },
-      "id": "58269eac-8f73-44eb-9663-107725db23ef",
-      "name": "Sticky · Draft + self-critique",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        523,
-        -111
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Human gate\nSlack Approve / Decline before anything is posted.",
-        "height": 479,
-        "width": 607,
-        "color": 6
-      },
-      "id": "57fae0d2-5b32-4dc5-9d2c-80a2e1c4c84d",
-      "name": "Sticky · Human gate",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1151,
-        -111
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Publish + log\nAyrshare posts it, then the live link is written back to the sheet.",
-        "height": 479,
-        "width": 449,
-        "color": 7
-      },
-      "id": "74debffb-0d43-4cef-bd5c-823d6ff77492",
-      "name": "Sticky · Publish + log",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1758,
-        -111
-      ]
     }
   ],
   "connections": {
@@ -617,6 +617,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

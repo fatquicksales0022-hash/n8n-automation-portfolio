@@ -3,6 +3,54 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Start dial\nManual / scheduled kick-off.",
+        "height": 255,
+        "width": 275,
+        "color": 5
+      },
+      "id": "617da057-184c-4667-8859-9cddc64d3ba7",
+      "name": "Sticky · Start dial",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -15
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Lead list + DNC guard\nLoad leads and skip anyone on the do-not-call list before dialing.",
+        "height": 255,
+        "width": 304,
+        "color": 2
+      },
+      "id": "aeec8d95-006e-4c4f-9b41-a31abaa3d522",
+      "name": "Sticky · Lead list + DNC guard",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        135,
+        -15
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Place AI call\nHTTP → Vapi (GPT-4o-mini voice over Twilio).",
+        "height": 255,
+        "width": 264,
+        "color": 3
+      },
+      "id": "13a95662-4a3f-4372-920a-b187cf93c5db",
+      "name": "Sticky · Place AI call",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        439,
+        -15
+      ]
+    },
+    {
+      "parameters": {
         "documentId": {
           "__rl": true,
           "value": "YOUR_SHEET_ID",
@@ -21,8 +69,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        208,
-        0
+        240,
+        80
       ],
       "id": "06828e68-afee-45af-8aca-4a4d6d3012d2",
       "name": "Get row(s) in sheet",
@@ -48,8 +96,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        624,
-        0
+        528,
+        80
       ],
       "id": "df283f82-b976-4a0a-b1b3-5f88c000703c",
       "name": "HTTP Request",
@@ -83,8 +131,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        0,
-        0
+        96,
+        80
       ],
       "id": "22ed1199-d53c-4aba-9dd7-a304adec3b44",
       "name": "Get DNC",
@@ -123,8 +171,8 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.3,
       "position": [
-        416,
-        0
+        368,
+        80
       ],
       "id": "8222948a-392f-4516-acf8-4a0d896f0541",
       "name": "Not on DNC"
@@ -134,59 +182,11 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -176,
-        0
+        -80,
+        80
       ],
       "id": "a58cf083-7077-4141-996c-9da022672065",
-      "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "content": "## ☎️ FeedbackVoice - Outbound Dialer\nReads a call list from Sheets -> places outbound calls via Vapi/Twilio (AI voice agent runs the feedback/qualification script) -> logs status back.\n**Vapi - Twilio - Google Sheets**",
-        "height": 351,
-        "width": 310,
-        "color": 7
-      },
-      "id": "e543668e-87bc-4b46-9185-42ea8ff89f38",
-      "name": "Sticky · Start dial",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -240,
-        -96
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Lead list + DNC guard\nLoad leads and skip anyone on the do-not-call list before dialing.",
-        "height": 351,
-        "width": 400,
-        "color": 2
-      },
-      "id": "3c4378b8-6ae0-44db-9fb1-0c054610c8ba",
-      "name": "Sticky · Lead list + DNC guard",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        80,
-        -96
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Place AI call\nHTTP → Vapi (GPT-4o-mini voice over Twilio).",
-        "height": 351,
-        "width": 325,
-        "color": 3
-      },
-      "id": "dd48d1f5-a168-400d-ac21-cf1c8c213db6",
-      "name": "Sticky · Place AI call",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        480,
-        -96
-      ]
+      "name": "When clicking 'Execute workflow'"
     }
   ],
   "connections": {
@@ -223,7 +223,7 @@
         ]
       ]
     },
-    "When clicking ‘Execute workflow’": {
+    "When clicking 'Execute workflow'": {
       "main": [
         [
           {
@@ -238,6 +238,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

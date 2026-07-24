@@ -3,8 +3,40 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Question",
+        "height": 623,
+        "width": 242,
+        "color": 5
+      },
+      "id": "c3dc0bd6-ba27-4ebf-a1cf-70c1b1c458cb",
+      "name": "Sticky · Question",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -95
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Retrieve + answer\nAgent searches the docs (pgvector), cites the source file, and refuses what isn't documented.",
+        "height": 623,
+        "width": 409,
+        "color": 3
+      },
+      "id": "6486f604-6210-4276-b9e6-15358a26070f",
+      "name": "Sticky · Retrieve + answer",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        182,
+        -95
+      ]
+    },
+    {
+      "parameters": {
         "options": {
-          "systemMessage": "=You are a customer support assistant. Answer ONLY using the retrieved\ndocumentation provided by your search tool.\n- If the docs don't contain the answer, say so and offer to escalate to\n  a human — do not guess or use outside knowledge.\n- Cite the source file name for each claim.\n- Be concise and friendly. Give steps as a numbered list when relevant."
+          "systemMessage": "=You are a customer support assistant. Answer ONLY using the retrieved\ndocumentation provided by your search tool.\n- If the docs don't contain the answer, say so and offer to escalate to\n  a human - do not guess or use outside knowledge.\n- Cite the source file name for each claim.\n- Be concise and friendly. Give steps as a numbered list when relevant."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -117,38 +149,6 @@
       "id": "c2b9aa74-c4c0-4695-bf32-7ed603993f42",
       "name": "Chat Trigger",
       "webhookId": "3b64184a-e697-4678-ab7a-4e9fbf5d5369"
-    },
-    {
-      "parameters": {
-        "content": "## 🤖 Build 4 - RAG Support Chatbot\nCustomer-support chat agent answers from your docs - retrieval over a Supabase vector store with memory.\n**OpenAI agent - Supabase vector store - window memory**",
-        "height": 623,
-        "width": 242,
-        "color": 7
-      },
-      "id": "1dcdebf6-3462-49ea-bb8a-20e186d1aa45",
-      "name": "Sticky · Question",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -95
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Retrieve + answer\nAgent searches the docs (pgvector), cites the source file, and refuses what isn't documented.",
-        "height": 623,
-        "width": 409,
-        "color": 3
-      },
-      "id": "4216921d-586d-4d95-b054-015432e6fbaf",
-      "name": "Sticky · Retrieve + answer",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        182,
-        -95
-      ]
     }
   ],
   "connections": {
@@ -211,6 +211,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

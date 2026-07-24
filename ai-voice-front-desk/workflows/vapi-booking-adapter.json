@@ -11,8 +11,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -720,
-        16
+        -736,
+        160
       ],
       "id": "9e415f0b-b2ed-43ba-b9e9-c7f7516f880b",
       "name": "Webhook",
@@ -25,21 +25,21 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -512,
-        16
+        -528,
+        160
       ],
       "id": "38e3304e-8067-4d3e-8c24-b1729b02972e",
       "name": "Extract"
     },
     {
       "parameters": {
-        "jsCode": "return [{ json: { results: [ {\n  toolCallId: $('Extract').first().json.toolCallId,\n  result: $json.confirmation || \"Sorry, I couldn't complete that booking — can we try another time?\"\n} ] } }];"
+        "jsCode": "return [{ json: { results: [ {\n  toolCallId: $('Extract').first().json.toolCallId,\n  result: $json.confirmation || \"Sorry, I couldn't complete that booking - can we try another time?\"\n} ] } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -96,
-        16
+        160
       ],
       "id": "aee1331e-e71c-4d21-bf45-53c70aacf5a5",
       "name": "Format Result"
@@ -53,8 +53,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        112,
-        16
+        96,
+        160
       ],
       "id": "ea1c9b15-5144-4f51-89af-9e66062ac053",
       "name": "Respond to Webhook"
@@ -62,7 +62,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://YOUR_N8N_HOST/webhook/vfd-book",
+        "url": "https://patrick-n8n.onrender.com/webhook/vfd-book",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ name: $json.name, service: $json.service, startTime: $json.startTime, phone: $json.phone }) }}",
@@ -78,8 +78,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -304,
-        16
+        -288,
+        160
       ],
       "id": "3b31e9ed-c891-48ef-a757-e254e12c4aed",
       "name": "Call Booking",
@@ -199,6 +199,214 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": {
+    "updatedAt": "2026-07-24T07:55:17.044Z",
+    "createdAt": "2026-07-24T07:55:17.044Z",
+    "versionId": "acd50ef5-0b24-4aaf-ad31-1f5469afb618",
+    "workflowId": "pISZTkeROIeiePST",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "vapi-book",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -736,
+          160
+        ],
+        "id": "9e415f0b-b2ed-43ba-b9e9-c7f7516f880b",
+        "name": "Webhook",
+        "webhookId": "097474f9-9181-4499-9985-608b0135095f"
+      },
+      {
+        "parameters": {
+          "jsCode": "const msg = $json.body.message;\nconst tc = (msg.toolCalls || msg.toolCallList || [])[0] || {};\nlet args = tc.function?.arguments ?? {};\nif (typeof args === 'string') { try { args = JSON.parse(args); } catch (e) { args = {}; } }\nreturn [{ json: {\n  toolCallId: tc.id || '',\n  name: args.name || '',\n  service: args.service || '',\n  startTime: args.startTime || '',\n  phone: msg.call?.customer?.number || ''\n}}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -528,
+          160
+        ],
+        "id": "38e3304e-8067-4d3e-8c24-b1729b02972e",
+        "name": "Extract"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: { results: [ {\n  toolCallId: $('Extract').first().json.toolCallId,\n  result: $json.confirmation || \"Sorry, I couldn't complete that booking - can we try another time?\"\n} ] } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -96,
+          160
+        ],
+        "id": "aee1331e-e71c-4d21-bf45-53c70aacf5a5",
+        "name": "Format Result"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ $json }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          96,
+          160
+        ],
+        "id": "ea1c9b15-5144-4f51-89af-9e66062ac053",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://patrick-n8n.onrender.com/webhook/vfd-book",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ name: $json.name, service: $json.service, startTime: $json.startTime, phone: $json.phone }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "text",
+                "outputPropertyName": "confirmation"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -288,
+          160
+        ],
+        "id": "3b31e9ed-c891-48ef-a757-e254e12c4aed",
+        "name": "Call Booking",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "content": "## 🔌 VFD - Vapi Booking Adapter\nBridges the Vapi realtime voice assistant to the n8n booking backend - maps Vapi tool-calls to the booking webhook and returns results in Vapi's {results:[{toolCallId,result}]} shape.\n**Vapi - webhook**",
+          "height": 234,
+          "width": 1080,
+          "color": 7
+        },
+        "id": "b274cbcd-f1e0-441c-8b7e-efa42822d554",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -736,
+          -416
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 1 · Receive & extract\nVapi POSTs the tool-call here. **Extract** pulls `name` / `service` / `startTime` from the LLM's tool arguments, plus the caller's number from the call object (empty on web test calls, filled on real PSTN).",
+          "height": 438,
+          "width": 400,
+          "color": 5
+        },
+        "id": "68b0aeef-cbcb-4cc1-be9b-b031f3e2d879",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -736,
+          -160
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 2 · Book\n**Call Booking** POSTs into the Smart Booking brain → round-robin across 3 stylist calendars + availability guard (no double-booking).",
+          "height": 438,
+          "width": 200,
+          "color": 4
+        },
+        "id": "e37a3ea4-d6dd-4307-b884-1bbc7c23c94b",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -336,
+          -160
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 3 · Respond to Vapi\n**Format Result** wraps the confirmation in Vapi's required `{results:[{toolCallId, result}]}` shape, then **Respond to Webhook** returns it so the assistant speaks the confirmation aloud.",
+          "height": 438,
+          "width": 400,
+          "color": 6
+        },
+        "id": "1eb61a3a-e787-4f2e-9854-d05737ff7ad2",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -128,
+          -160
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Extract",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract": {
+        "main": [
+          [
+            {
+              "node": "Call Booking",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Result": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call Booking": {
+        "main": [
+          [
+            {
+              "node": "Format Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Patrick Sales",
+    "name": null,
+    "description": null,
+    "autosaved": false
   }
 }

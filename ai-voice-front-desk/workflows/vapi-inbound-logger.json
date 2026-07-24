@@ -10,8 +10,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        -16,
+        192
       ],
       "id": "9660fd9a-5c99-4da1-85d3-25c3821256b2",
       "name": "Webhook",
@@ -45,8 +45,8 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.3,
       "position": [
-        208,
-        0
+        224,
+        192
       ],
       "id": "b6b11fb4-27dc-4cee-b8b2-60bb6154d023",
       "name": "Filter"
@@ -61,14 +61,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        416,
-        0
+        448,
+        192
       ],
       "id": "ee92db93-d1e0-40fa-abca-68328cd1da5e",
       "name": "Get Call",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "YOUR_CREDENTIAL_ID",
+          "id": "mV2e0zHo28aBSvle",
           "name": "Vapi Header"
         }
       }
@@ -80,8 +80,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        624,
-        0
+        640,
+        192
       ],
       "id": "005130bc-b40f-4dff-9b1d-46f19a886dc2",
       "name": "Normalizer"
@@ -93,8 +93,7 @@
           "__rl": true,
           "value": "YOUR_SHEET_ID",
           "mode": "list",
-          "cachedResultName": "VFD Bookings",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"
+          "cachedResultName": "YOUR_SHEET_ID"
         },
         "sheetName": {
           "__rl": true,
@@ -199,13 +198,13 @@
       "typeVersion": 4.7,
       "position": [
         832,
-        0
+        192
       ],
       "id": "675d0115-5cf1-4202-8d50-d94a7e34a1fb",
       "name": "Append row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "YOUR_CREDENTIAL_ID",
+          "id": "yMqkk4M0kF50KIC0",
           "name": "Google Sheets account"
         }
       }
@@ -324,6 +323,338 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": {
+    "updatedAt": "2026-07-24T07:55:14.531Z",
+    "createdAt": "2026-07-24T07:55:14.531Z",
+    "versionId": "a4da8b8e-8d60-49f5-a7bf-dd2af3a218c6",
+    "workflowId": "yhk0rEK8soEjGxwG",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "vfd-inbound-log",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -16,
+          192
+        ],
+        "id": "9660fd9a-5c99-4da1-85d3-25c3821256b2",
+        "name": "Webhook",
+        "webhookId": "f43036b1-ae4c-463f-85dd-9cdf7e13bade"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "cf86b5b7-02a4-4258-aee0-298171711dbe",
+                "leftValue": "={{ $json.body.message.type }}",
+                "rightValue": "=end-of-call-report",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          224,
+          192
+        ],
+        "id": "b6b11fb4-27dc-4cee-b8b2-60bb6154d023",
+        "name": "Filter"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.vapi.ai/call/{{ $json.headers['x-call-id'] }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          448,
+          192
+        ],
+        "id": "ee92db93-d1e0-40fa-abca-68328cd1da5e",
+        "name": "Get Call",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "mV2e0zHo28aBSvle",
+            "name": "Vapi Header"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const call = $json;\nconst analysis = call.analysis || {};\nconst artifact = call.artifact || {};\nreturn [{ json: {\n  ended_at:      call.endedAt || '',\n  caller_number: call.customer?.number || '',\n  call_type:     call.type || '',\n  ended_reason:  call.endedReason || '',\n  cost:          call.cost ?? '',\n  summary:       analysis.summary || '',\n  recording_url: artifact.recordingUrl || call.recordingUrl || '',\n  transcript:    artifact.transcript || call.transcript || '',\n  call_id:       call.id || ''\n}}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          640,
+          192
+        ],
+        "id": "005130bc-b40f-4dff-9b1d-46f19a886dc2",
+        "name": "Normalizer"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "YOUR_SHEET_ID",
+            "mode": "list",
+            "cachedResultName": "YOUR_SHEET_ID"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1491501082,
+            "mode": "list",
+            "cachedResultName": " Inbound Call Log",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=1491501082"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "ended_at",
+                "displayName": "ended_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "caller_number",
+                "displayName": "caller_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "call_type",
+                "displayName": "call_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "ended_reason",
+                "displayName": "ended_reason",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "cost",
+                "displayName": "cost",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "summary",
+                "displayName": "summary",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "recording_url",
+                "displayName": "recording_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "transcript",
+                "displayName": "transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "call_id",
+                "displayName": "call_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          832,
+          192
+        ],
+        "id": "675d0115-5cf1-4202-8d50-d94a7e34a1fb",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "yMqkk4M0kF50KIC0",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## 📇 VFD - Inbound Call Logger\nLogs inbound call events + transcripts to Google Sheets for reporting.\n**Vapi - Google Sheets - webhook**",
+          "height": 202,
+          "width": 1080,
+          "color": 7
+        },
+        "id": "3c6aea71-648b-4eab-9897-13191e2e2a6f",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -16,
+          -384
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 1 · Receive & filter\nVapi's Server URL posts many event types here. **Filter** keeps only `end-of-call-report` and drops the noisy status/speech updates.",
+          "height": 486,
+          "width": 400,
+          "color": 5
+        },
+        "id": "4fb80573-00e0-49b7-8edf-b396959360d6",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -16,
+          -160
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 2 · Re-fetch (free)\n**Get Call** does a GET on the Vapi API using the `x-call-id` header — the full transcript + recording URL come back here. (API reads are free; only placing calls costs.)",
+          "height": 486,
+          "width": 200,
+          "color": 4
+        },
+        "id": "ae64fa45-0e47-4727-97c4-fe0dc802079b",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          400,
+          -160
+        ]
+      },
+      {
+        "parameters": {
+          "content": "### 3 · Normalize & log\n**Normalizer** flattens 9 fields (ended_at, caller_number, cost, summary, recording_url, transcript, …) → **Append** to the Inbound Call Log sheet via auto-map.",
+          "height": 486,
+          "width": 440,
+          "color": 6
+        },
+        "id": "db32a7ec-efd6-4dbf-be55-5ce2e381e9d2",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          624,
+          -160
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter": {
+        "main": [
+          [
+            {
+              "node": "Get Call",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Call": {
+        "main": [
+          [
+            {
+              "node": "Normalizer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalizer": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Patrick Sales",
+    "name": null,
+    "description": null,
+    "autosaved": false
   }
 }

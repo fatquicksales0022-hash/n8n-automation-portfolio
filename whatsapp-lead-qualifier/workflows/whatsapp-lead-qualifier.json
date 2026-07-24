@@ -3,10 +3,74 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## New message",
+        "height": 527,
+        "width": 539,
+        "color": 5
+      },
+      "id": "28ec55b7-357d-4ad8-903c-fce7620d7a5e",
+      "name": "Sticky · New message",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -364,
+        -159
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Qualify (BANT agent)\nLoads lead state (resumable per phone), scores with Postgres memory, upserts the lead, replies on WhatsApp.",
+        "height": 527,
+        "width": 600,
+        "color": 3
+      },
+      "id": "87212b02-4b78-413a-b497-f698a25b6809",
+      "name": "Sticky · Qualify (BANT agent)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        175,
+        -159
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Hot lead?",
+        "height": 527,
+        "width": 447,
+        "color": 6
+      },
+      "id": "b87c77fd-95c3-4fab-878d-2c1987b854b4",
+      "name": "Sticky · Hot lead?",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        775,
+        -159
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Alert sales\nSlack alert + booking link.",
+        "height": 527,
+        "width": 281,
+        "color": 7
+      },
+      "id": "69728108-845e-4c1c-bfeb-fd96979a2cff",
+      "name": "Sticky · Alert sales",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1222,
+        -159
+      ]
+    },
+    {
+      "parameters": {
         "promptType": "define",
         "text": "={{ $('Edit Fields').item.json.text }}",
         "options": {
-          "systemMessage": "=You qualify inbound leads over WhatsApp for [YOUR COMPANY]. Be friendly,\nconcise (WhatsApp-length: 1-3 sentences), and ask ONE question at a time.\n\nCollect, in natural order: the person's need, company, budget range,\nwho makes the decision, and timeline. Don't interrogate — weave\nquestions into a normal conversation and acknowledge their answers.\n\nAs you learn each fact, call upsert_lead to save it. Maintain a running\nscore (0-100): need 30, budget 25, authority 20, timeline 25.\n\n- When score >= 70 AND timeline is now/this_quarter: set stage=qualified,\n  call upsert_lead with that stage, and warmly share this booking link:\n  https://calendly.com/fatquicksales0022/30min.\n- When clearly not a fit (no need or no budget): set stage=disqualified,\n  thank them, and offer a newsletter link.\n- Never invent prices, availability, or commitments. If asked something\n  you don't know, say a human will follow up.\n\nCall upsert_lead immediately after every message where the user shares any new detail (need, company, budget, authority, timeline), saving everything known so far — even if incomplete\n\nKnown so far: {{ JSON.stringify($('Load Lead').item.json) }}"
+          "systemMessage": "=You qualify inbound leads over WhatsApp for [YOUR COMPANY]. Be friendly,\nconcise (WhatsApp-length: 1-3 sentences), and ask ONE question at a time.\n\nCollect, in natural order: the person's need, company, budget range,\nwho makes the decision, and timeline. Don't interrogate - weave\nquestions into a normal conversation and acknowledge their answers.\n\nAs you learn each fact, call upsert_lead to save it. Maintain a running\nscore (0-100): need 30, budget 25, authority 20, timeline 25.\n\n- When score >= 70 AND timeline is now/this_quarter: set stage=qualified,\n  call upsert_lead with that stage, and warmly share this booking link:\n  https://calendly.com/fatquicksales0022/30min.\n- When clearly not a fit (no need or no budget): set stage=disqualified,\n  thank them, and offer a newsletter link.\n- Never invent prices, availability, or commitments. If asked something\n  you don't know, say a human will follow up.\n\nCall upsert_lead immediately after every message where the user shares any new detail (need, company, budget, authority, timeline), saving everything known so far - even if incomplete\n\nKnown so far: {{ JSON.stringify($('Load Lead').item.json) }}"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -39,7 +103,7 @@
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "Re9Hguci7X6C0pKF",
+          "id": "SYpGRkU0nCCv3rd3",
           "name": "OpenAI account"
         }
       }
@@ -111,7 +175,7 @@
           "mode": "list",
           "cachedResultName": "YOUR_SLACK_CHANNEL_ID"
         },
-        "text": "= New qualified lead — budget {{ $json.budget }}, timeline {{ $json.timeline }}, score {{ $json.score }}. Need: {{ $json.need }}",
+        "text": "= New qualified lead - budget {{ $json.budget }}, timeline {{ $json.timeline }}, score {{ $json.score }}. Need: {{ $json.need }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -231,7 +295,7 @@
       "webhookId": "ba88589e-68b5-4e1e-b72b-bf8d9daa9ff2",
       "credentials": {
         "whatsAppTriggerApi": {
-          "id": "fPJoKuThEujKYuoz",
+          "id": "tfSGKYrop74ppHqG",
           "name": "WhatsApp OAuth account"
         }
       }
@@ -268,7 +332,7 @@
     {
       "parameters": {
         "operation": "send",
-        "phoneNumberId": "YOUR_VAPI_PHONE_NUMBER_ID",
+        "phoneNumberId": "YOUR_PHONE_NUMBER_ID",
         "recipientPhoneNumber": "={{ $('Edit Fields').item.json.phone }}",
         "textBody": "={{ $('AI Agent').item.json.output }}",
         "additionalFields": {}
@@ -288,70 +352,6 @@
           "name": "WhatsApp account 2"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 📱 Build 3 - WhatsApp Lead Qualifier\nInbound WhatsApp message -> AI agent qualifies the lead, stores it in Postgres/Supabase with chat memory -> Slack alert + WhatsApp reply.\n**OpenAI agent - WhatsApp - Postgres memory - Supabase - Slack**",
-        "height": 527,
-        "width": 539,
-        "color": 7
-      },
-      "id": "2b3e8df8-1a29-42e3-97c7-88f4ec0403ac",
-      "name": "Sticky · New message",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -364,
-        -159
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Qualify (BANT agent)\nLoads lead state (resumable per phone), scores with Postgres memory, upserts the lead, replies on WhatsApp.",
-        "height": 527,
-        "width": 600,
-        "color": 3
-      },
-      "id": "9c7e7e85-f739-47f2-be69-648f74e5a549",
-      "name": "Sticky · Qualify (BANT agent)",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        175,
-        -159
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Hot lead?",
-        "height": 527,
-        "width": 447,
-        "color": 6
-      },
-      "id": "9eb9f15d-c558-4516-86c0-e1a91229844b",
-      "name": "Sticky · Hot lead?",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        775,
-        -159
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Alert sales\nSlack alert + booking link.",
-        "height": 527,
-        "width": 281,
-        "color": 7
-      },
-      "id": "9014f73d-0e6b-4d7f-8de7-8187234d5ed3",
-      "name": "Sticky · Alert sales",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1222,
-        -159
-      ]
     }
   ],
   "connections": {
@@ -471,6 +471,8 @@
     "binaryMode": "separate",
     "availableInMCP": false,
     "timeSavedMode": "fixed",
-    "callerPolicy": "workflowsFromSameOwner"
-  }
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

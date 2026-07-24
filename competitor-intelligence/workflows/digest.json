@@ -3,6 +3,70 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Weekly schedule",
+        "height": 575,
+        "width": 270,
+        "color": 5
+      },
+      "id": "d1a8b90b-c4af-41eb-9c5e-9a7ded640a87",
+      "name": "Sticky · Weekly schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -191
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Gather the week\nPull the week's changes and aggregate.",
+        "height": 575,
+        "width": 312,
+        "color": 2
+      },
+      "id": "1468cba6-88c6-423a-9b64-842ab05ac6ac",
+      "name": "Sticky · Gather the week",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        210,
+        -191
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Write the brief\nSectioned weekly summary.",
+        "height": 575,
+        "width": 328,
+        "color": 3
+      },
+      "id": "a49279cc-8560-49ce-add7-82adc26020fe",
+      "name": "Sticky · Write the brief",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        522,
+        -191
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Deliver\nEmail + Slack.",
+        "height": 575,
+        "width": 285,
+        "color": 7
+      },
+      "id": "3732c5bf-7d82-4643-bb01-c65fee3d6a6f",
+      "name": "Sticky · Deliver",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        850,
+        -191
+      ]
+    },
+    {
+      "parameters": {
         "rule": {
           "interval": [
             {
@@ -39,7 +103,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=You are a competitive analyst. The items below are competitor changes across THREE separate businesses, tagged by a \"brand\" field:\n- Wedded Wonderland (weddings)\n- Liviti Property (Australian property investment)\n- Closers Cult (high-ticket sales training)\n\nWrite a weekly intel brief ORGANIZED INTO THREE SECTIONS — one per brand, in that order. Use the brand name as each section heading. Under each brand, cover: (1) the most important moves, (2) any pricing/product/offer changes, (3) a short watch list. Cite each competitor by name. Only use the evidence in the items — do not speculate. If a brand has no notable items this week, write \"No significant moves this week.\" under its heading.\n\nItems (each tagged with its brand): {{ JSON.stringify($json.items) }}",
+        "text": "=You are a competitive analyst. The items below are competitor changes across THREE separate businesses, tagged by a \"brand\" field:\n- Wedded Wonderland (weddings)\n- Liviti Property (Australian property investment)\n- Closers Cult (high-ticket sales training)\n\nWrite a weekly intel brief ORGANIZED INTO THREE SECTIONS - one per brand, in that order. Use the brand name as each section heading. Under each brand, cover: (1) the most important moves, (2) any pricing/product/offer changes, (3) a short watch list. Cite each competitor by name. Only use the evidence in the items - do not speculate. If a brand has no notable items this week, write \"No significant moves this week.\" under its heading.\n\nItems (each tagged with its brand): {{ JSON.stringify($json.items) }}",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -80,7 +144,7 @@
     {
       "parameters": {
         "sendTo": "you@example.com",
-        "subject": "= Weekly Competitor Intel Brief — {{ $now.toISODate() }}",
+        "subject": "= Weekly Competitor Intel Brief - {{ $now.toISODate() }}",
         "emailType": "text",
         "message": "={{ $json.text }}",
         "options": {}
@@ -97,7 +161,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -162,70 +226,6 @@
           "name": "Supabase API Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 📰 Build 2 - Daily Content Digest\nScheduled: pulls new items from Supabase, AI writes a digest, delivers to Gmail + Slack.\n**OpenAI - Supabase - Gmail - Slack**",
-        "height": 575,
-        "width": 270,
-        "color": 7
-      },
-      "id": "50015905-9446-4db7-8753-0997a8036fde",
-      "name": "Sticky · Weekly schedule",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -191
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Gather the week\nPull the week's changes and aggregate.",
-        "height": 575,
-        "width": 312,
-        "color": 2
-      },
-      "id": "a18f4f25-5d45-4876-9783-4f4af1eb45a7",
-      "name": "Sticky · Gather the week",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        210,
-        -191
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Write the brief\nSectioned weekly summary.",
-        "height": 575,
-        "width": 328,
-        "color": 3
-      },
-      "id": "d547fcd2-4315-4449-93f5-199c8c2d2c63",
-      "name": "Sticky · Write the brief",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        522,
-        -191
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Deliver\nEmail + Slack.",
-        "height": 575,
-        "width": 285,
-        "color": 7
-      },
-      "id": "77c1a71f-ea4c-4de6-b647-1901b9fb8254",
-      "name": "Sticky · Deliver",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        850,
-        -191
-      ]
     }
   ],
   "connections": {
@@ -293,6 +293,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

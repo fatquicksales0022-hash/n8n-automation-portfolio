@@ -3,6 +3,38 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Question",
+        "height": 495,
+        "width": 276,
+        "color": 5
+      },
+      "id": "2b1bc4ac-f7fa-41d1-ac8d-9b165115ae0c",
+      "name": "Sticky · Question",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -95
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Answer from intel\nAgent retrieves over pgvector and answers only from logged changes.",
+        "height": 495,
+        "width": 487,
+        "color": 3
+      },
+      "id": "a7a89229-9c1b-445f-8919-bfb5f0a6f30d",
+      "name": "Sticky · Answer from intel",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        216,
+        -95
+      ]
+    },
+    {
+      "parameters": {
         "public": true,
         "options": {}
       },
@@ -19,7 +51,7 @@
     {
       "parameters": {
         "options": {
-          "systemMessage": "=You are a competitive intelligence assistant. Answer questions about competitors using ONLY what your search_intel tool returns — a database of competitor change summaries (each tagged with competitor name, brand, change_type, and date).\n- Always search before answering.\n- Cite the competitor by name, and the brand when relevant (Wedded Wonderland, Liviti Property, or Closers Cult).\n- If the search returns nothing relevant, say you don't have intel on that yet — never make things up.\n- Be concise."
+          "systemMessage": "=You are a competitive intelligence assistant. Answer questions about competitors using ONLY what your search_intel tool returns - a database of competitor change summaries (each tagged with competitor name, brand, change_type, and date).\n- Always search before answering.\n- Cite the competitor by name, and the brand when relevant (Wedded Wonderland, Liviti Property, or Closers Cult).\n- If the search returns nothing relevant, say you don't have intel on that yet - never make things up.\n- Be concise."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -115,38 +147,6 @@
           "name": "Supabase API Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 💬 Build 2 - Knowledge-Base Chat (RAG)\nChat agent answers questions over the crawled content - retrieves from the Supabase vector store with conversation memory.\n**OpenAI agent - Supabase vector store - window memory**",
-        "height": 495,
-        "width": 276,
-        "color": 7
-      },
-      "id": "70b104fa-5d51-4873-9ad1-818fd82e15e1",
-      "name": "Sticky · Question",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -95
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Answer from intel\nAgent retrieves over pgvector and answers only from logged changes.",
-        "height": 495,
-        "width": 487,
-        "color": 3
-      },
-      "id": "f514d1dd-f724-4643-bd5e-94c655f67d40",
-      "name": "Sticky · Answer from intel",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        216,
-        -95
-      ]
     }
   ],
   "connections": {
@@ -209,6 +209,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

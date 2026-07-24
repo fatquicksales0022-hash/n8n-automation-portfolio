@@ -2,6 +2,54 @@
   "name": "VFD — Outbound Call (Twilio)",
   "nodes": [
     {
+      "parameters": {
+        "content": "## Start dial\nManual / scheduled kick-off.",
+        "height": 255,
+        "width": 222,
+        "color": 5
+      },
+      "id": "fd6a8853-208e-4fe4-a9c4-991ea496b769",
+      "name": "Sticky · Start dial",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -95
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Lead list\nPulls the next lead from the sheet.",
+        "height": 255,
+        "width": 208,
+        "color": 2
+      },
+      "id": "d4a79a35-c9fe-40f0-96d4-4fe243540db3",
+      "name": "Sticky · Lead list",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        162,
+        -95
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Place the call\nTwilio dials the lead with a personalized pitch.",
+        "height": 255,
+        "width": 221,
+        "color": 7
+      },
+      "id": "73f32b7a-4802-451b-b3b0-d870c7a27776",
+      "name": "Sticky · Place the call",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        370,
+        -95
+      ]
+    },
+    {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
@@ -10,7 +58,7 @@
         0
       ],
       "id": "98262b37-bb85-40e7-a7c3-edb332ff89d3",
-      "name": "When clicking ‘Execute workflow’"
+      "name": "When clicking 'Execute workflow'"
     },
     {
       "parameters": {
@@ -18,7 +66,7 @@
         "from": "YOUR_PHONE_NUMBER",
         "to": "={{ String($json.Phone).startsWith('+') ? String($json.Phone) : '+' + String($json.Phone) }}",
         "twiml": true,
-        "message": "=<Response>\n  <Say voice=\"Polly.Joanna\">Hi {{ $json.Name }}, this is Bella from Glow Salon. We have a few openings this week — would you like to book a haircut or a styling appointment?</Say>\n  <Gather input=\"speech\" action=\"https://YOUR_PUBLIC_N8N_URL/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">No problem, we'll reach out another time. Goodbye.</Say>\n</Response>",
+        "message": "=<Response>\n  <Say voice=\"Polly.Joanna\">Hi {{ $json.Name }}, this is Bella from Glow Salon. We have a few openings this week - would you like to book a haircut or a styling appointment?</Say>\n  <Gather input=\"speech\" action=\"https://YOUR_PUBLIC_N8N_URL/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">No problem, we'll reach out another time. Goodbye.</Say>\n</Response>",
         "options": {}
       },
       "type": "n8n-nodes-base.twilio",
@@ -67,58 +115,10 @@
           "name": "Google Sheets account"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 📤 VFD - Outbound Call\nPlaces outbound Twilio calls from a Sheets list (manual trigger).\n**Twilio - Google Sheets**",
-        "height": 255,
-        "width": 222,
-        "color": 7
-      },
-      "id": "0939696f-9cdc-45dd-803c-3263d49564cd",
-      "name": "Sticky · Start dial",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -95
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Lead list\nPulls the next lead from the sheet.",
-        "height": 255,
-        "width": 208,
-        "color": 2
-      },
-      "id": "0a839faa-cc39-401b-abf6-dd908718d882",
-      "name": "Sticky · Lead list",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        162,
-        -95
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Place the call\nTwilio dials the lead with a personalized pitch.",
-        "height": 255,
-        "width": 221,
-        "color": 7
-      },
-      "id": "6955e63f-0fe7-4d6f-921f-7a31e31ccc66",
-      "name": "Sticky · Place the call",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        370,
-        -95
-      ]
     }
   ],
   "connections": {
-    "When clicking ‘Execute workflow’": {
+    "When clicking 'Execute workflow'": {
       "main": [
         [
           {
@@ -144,6 +144,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

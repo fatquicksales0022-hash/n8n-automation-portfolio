@@ -3,6 +3,86 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## New email",
+        "height": 815,
+        "width": 378,
+        "color": 5
+      },
+      "id": "2e5d73ce-4453-4c28-8f77-0f74595d77df",
+      "name": "Sticky · New email",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -447
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Normalize",
+        "height": 815,
+        "width": 244,
+        "color": 2
+      },
+      "id": "dcaa7dc6-92ae-4b25-ade5-bebc763da453",
+      "name": "Sticky · Normalize",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        318,
+        -447
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## BANT score\nBudget · authority · need · timeline → score + stage.",
+        "height": 815,
+        "width": 272,
+        "color": 3
+      },
+      "id": "2f65decc-d424-4095-aea7-14dff5ec0a22",
+      "name": "Sticky · BANT score",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        562,
+        -447
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Route\nhot / warm / dismiss.",
+        "height": 815,
+        "width": 576,
+        "color": 6
+      },
+      "id": "cfabdf53-231b-4262-a9df-11d52b4bf3da",
+      "name": "Sticky · Route",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        834,
+        -447
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Save · alert · reply\nCapture to DB + tracker sheet, Slack alert, label, temperature-aware auto-reply. The warm path captures incomplete inquiries instead of dropping them.",
+        "height": 815,
+        "width": 1181,
+        "color": 7
+      },
+      "id": "b927584a-22ee-4e96-bce5-077bb0e9bfdd",
+      "name": "Sticky · Save · alert · reply",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1410,
+        -447
+      ]
+    },
+    {
+      "parameters": {
         "pollTimes": {
           "item": [
             {
@@ -26,7 +106,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -120,7 +200,7 @@
             {
               "name": "score",
               "type": "number",
-              "description": "BANT fit, 0–100"
+              "description": "BANT fit, 0-100"
             },
             {
               "name": "stage",
@@ -133,7 +213,7 @@
           ]
         },
         "options": {
-          "systemPromptTemplate": "=You are a B2B sales lead qualifier. Read the inbound email and assess it with the BANT framework (Budget, Authority, Need, Timeline). Extract the sender's details and score the lead 0–100.\n\nScoring (25 points each):\n- Budget: a clear, sufficient budget is stated = full; vague/partial = some; none = 0.\n- Authority: sender is a decision-maker (founder, owner, C-level, \"my call to make\") = full; influencer = partial; unknown = 0.\n- Need: a clear, specific problem your service solves = full; vague curiosity = partial.\n- Timeline: wants to act soon (within ~1 month) = full; later = partial; none = 0.\n\nSet stage:\n- \"qualified\"      -> is_lead is true AND score >= 60\n- \"unclear\"        -> a real inquiry but too little info (score 30–59)\n- \"not_qualified\"  -> not a genuine buying inquiry (spam, newsletter, job application, vendor pitch) or very low score\n\nis_lead = true ONLY for genuine business/sales inquiries.\nFor any field the email does not state, return the literal string \"unknown\" — never invent a value, and never output the word \"undefined\".\nsummary = one short sentence."
+          "systemPromptTemplate": "=You are a B2B sales lead qualifier. Read the inbound email and assess it with the BANT framework (Budget, Authority, Need, Timeline). Extract the sender's details and score the lead 0-100.\n\nScoring (25 points each):\n- Budget: a clear, sufficient budget is stated = full; vague/partial = some; none = 0.\n- Authority: sender is a decision-maker (founder, owner, C-level, \"my call to make\") = full; influencer = partial; unknown = 0.\n- Need: a clear, specific problem your service solves = full; vague curiosity = partial.\n- Timeline: wants to act soon (within ~1 month) = full; later = partial; none = 0.\n\nSet stage:\n- \"qualified\"      -> is_lead is true AND score >= 60\n- \"unclear\"        -> a real inquiry but too little info (score 30-59)\n- \"not_qualified\"  -> not a genuine buying inquiry (spam, newsletter, job application, vendor pitch) or very low score\n\nis_lead = true ONLY for genuine business/sales inquiries.\nFor any field the email does not state, return the literal string \"unknown\" - never invent a value, and never output the word \"undefined\".\nsummary = one short sentence."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
@@ -190,7 +270,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -202,7 +282,7 @@
           "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "id"
         },
-        "text": "=🔥 New qualified email lead — {{ $('Information Extractor').first().json.output.name }} ({{ $('Normalize').first().json.fromEmail }})\nCompany: {{ $('Information Extractor').first().json.output.company }}\nBudget: {{ $('Information Extractor').first().json.output.budget }} · Timeline: {{ $('Information Extractor').first().json.output.timeline }} · Score: {{ $('Information Extractor').first().json.output.score }}\nNeed: {{ $('Information Extractor').first().json.output.need }}\n\n👉 Reply now: https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}",
+        "text": "=?? New qualified email lead - {{ $('Information Extractor').first().json.output.name }} ({{ $('Normalize').first().json.fromEmail }})\nCompany: {{ $('Information Extractor').first().json.output.company }}\nBudget: {{ $('Information Extractor').first().json.output.budget }} � Timeline: {{ $('Information Extractor').first().json.output.timeline }} � Score: {{ $('Information Extractor').first().json.output.score }}\nNeed: {{ $('Information Extractor').first().json.output.need }}\n\n?? Reply now: https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -241,7 +321,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -262,7 +342,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -341,7 +421,7 @@
           "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "id"
         },
-        "text": "=🔥 New qualified email lead — {{ $('Information Extractor').first().json.output.name }} ({{ $('Normalize').first().json.fromEmail }})\nCompany: {{ $('Information Extractor').first().json.output.company }}\nBudget: {{ $('Information Extractor').first().json.output.budget }} · Timeline: {{ $('Information Extractor').first().json.output.timeline }} · Score: {{ $('Information Extractor').first().json.output.score }}\nNeed: {{ $('Information Extractor').first().json.output.need }}\n\n👉 Reply now: https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}",
+        "text": "=?? New qualified email lead - {{ $('Information Extractor').first().json.output.name }} ({{ $('Normalize').first().json.fromEmail }})\nCompany: {{ $('Information Extractor').first().json.output.company }}\nBudget: {{ $('Information Extractor').first().json.output.budget }} � Timeline: {{ $('Information Extractor').first().json.output.timeline }} � Score: {{ $('Information Extractor').first().json.output.score }}\nNeed: {{ $('Information Extractor').first().json.output.need }}\n\n?? Reply now: https://mail.google.com/mail/u/0/#inbox/{{ $('Normalize').first().json.threadId }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -380,14 +460,14 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Write a brief, warm acknowledgment email reply to a HOT sales lead who is ready to move.\n\nLead's name: {{ $('Information Extractor').first().json.output.name }}\nTheir need: {{ $('Information Extractor').first().json.output.need }}\n\nRules:\n- 3–4 sentences max. Friendly, professional, confident.\n- Thank them, confirm it sounds like a strong fit, and say you'll personally reach out shortly to set up a call.\n- Invite them to book directly: https://calendly.com/fatquicksales0022/30min\n- Do NOT mention or invent any prices, package names, or specific features.\n- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.\n- Sign off as Patrick Sales, Closers Cult.\n- Output ONLY the email body text, no subject line.",
+        "text": "=Write a brief, warm acknowledgment email reply to a HOT sales lead who is ready to move.\n\nLead's name: {{ $('Information Extractor').first().json.output.name }}\nTheir need: {{ $('Information Extractor').first().json.output.need }}\n\nRules:\n- 3-4 sentences max. Friendly, professional, confident.\n- Thank them, confirm it sounds like a strong fit, and say you'll personally reach out shortly to set up a call.\n- Invite them to book directly: https://calendly.com/fatquicksales0022/30min\n- Do NOT mention or invent any prices, package names, or specific features.\n- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.\n- Sign off as Patrick Sales, Closers Cult.\n- Output ONLY the email body text, no subject line.",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -428,7 +508,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Write a brief, warm acknowledgment email reply to a WARM sales lead — genuinely interested but hasn't shared budget or timeline yet.\n\nLead's name: {{ $('Information Extractor').first().json.output.name }}\nTheir need: {{ $('Information Extractor').first().json.output.need }}\n\nRules:\n- 3–5 sentences max. Friendly, helpful, no pressure.\n- Thank them and give a 1–2 sentence high-level overview of how you help — WITHOUT inventing prices, package names, or specific features.\n- Politely ask two qualifying questions: their rough budget and ideal timeline, so you can point them to the right fit.\n- Invite them to book a quick call: https://calendly.com/fatquicksales0022/30min\n- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.\n- Sign off as Patrick Sales, Closers Cult.\n- Output ONLY the email body text, no subject line.",
+        "text": "=Write a brief, warm acknowledgment email reply to a WARM sales lead - genuinely interested but hasn't shared budget or timeline yet.\n\nLead's name: {{ $('Information Extractor').first().json.output.name }}\nTheir need: {{ $('Information Extractor').first().json.output.need }}\n\nRules:\n- 3-5 sentences max. Friendly, helpful, no pressure.\n- Thank them and give a 1-2 sentence high-level overview of how you help - WITHOUT inventing prices, package names, or specific features.\n- Politely ask two qualifying questions: their rough budget and ideal timeline, so you can point them to the right fit.\n- Invite them to book a quick call: https://calendly.com/fatquicksales0022/30min\n- Do NOT use placeholders or brackets like [ ]. Output a complete, ready-to-send email.\n- Sign off as Patrick Sales, Closers Cult.\n- Output ONLY the email body text, no subject line.",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -486,7 +566,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -510,7 +590,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -863,86 +943,6 @@
           "name": "Supabase Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 🎯 Build 7 - Email Lead Qualifier\nInbound Gmail leads scored + qualified by AI, routed by tier, logged to Sheets/Postgres, with AI-drafted replies and Slack alerts.\n**OpenAI - Gmail - Google Sheets - Postgres - Slack**",
-        "height": 815,
-        "width": 378,
-        "color": 7
-      },
-      "id": "b0de26ec-3820-4e3e-855a-5e2f8efb92cf",
-      "name": "Sticky · New email",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -447
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Normalize",
-        "height": 815,
-        "width": 244,
-        "color": 2
-      },
-      "id": "ec1b429f-9cd9-4835-a584-7e8dc3ee4d83",
-      "name": "Sticky · Normalize",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        318,
-        -447
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## BANT score\nBudget · authority · need · timeline → score + stage.",
-        "height": 815,
-        "width": 272,
-        "color": 3
-      },
-      "id": "74ad8309-0c3b-4490-b0c4-d14728a2e862",
-      "name": "Sticky · BANT score",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        562,
-        -447
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Route\nhot / warm / dismiss.",
-        "height": 815,
-        "width": 576,
-        "color": 6
-      },
-      "id": "f1ecc0ba-af1b-4c8c-8d8b-499132e20a10",
-      "name": "Sticky · Route",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        834,
-        -447
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Save · alert · reply\nCapture to DB + tracker sheet, Slack alert, label, temperature-aware auto-reply. The warm path captures incomplete inquiries instead of dropping them.",
-        "height": 815,
-        "width": 1181,
-        "color": 7
-      },
-      "id": "081aca99-ae2a-4357-a1f6-b695180dc092",
-      "name": "Sticky · Save · alert · reply",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1410,
-        -447
-      ]
     }
   ],
   "connections": {
@@ -1162,6 +1162,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

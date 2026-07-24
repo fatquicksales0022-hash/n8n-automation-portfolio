@@ -3,6 +3,38 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## MCP server\nExposes the toolbox to the agent.",
+        "height": 447,
+        "width": 408,
+        "color": 5
+      },
+      "id": "2d1b0c7f-28ee-4203-9cbd-14da1d5effb6",
+      "name": "Sticky · MCP server",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        196,
+        -143
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Toolbox\nCalendar · Gmail · Sheets · web search · Supabase · calculator.",
+        "height": 447,
+        "width": 883,
+        "color": 7
+      },
+      "id": "903d3360-b82d-41f2-93e0-33b3c28c9bd0",
+      "name": "Sticky · Toolbox",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        604,
+        -143
+      ]
+    },
+    {
+      "parameters": {
         "path": "420332d2-7dde-48ab-bd0a-dad51dd3e457"
       },
       "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
@@ -38,7 +70,7 @@
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "cbpTHgNL1Qh9uhoP",
-          "name": "Google Calendar account"
+          "name": "Google Calendar account Local"
         }
       }
     },
@@ -61,7 +93,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -90,7 +122,7 @@
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "cbpTHgNL1Qh9uhoP",
-          "name": "Google Calendar account"
+          "name": "Google Calendar account Local"
         }
       }
     },
@@ -213,38 +245,6 @@
           "name": "SerpApi account"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 🧰 MCP Server for Claude Desktop\nExposes a toolbox to Claude Desktop over MCP: Google Calendar, Gmail, Google Sheets, Supabase, web search (SerpApi), calculator. Claude calls these tools directly.\n**n8n MCP Server - Google - Supabase - SerpApi**",
-        "height": 447,
-        "width": 408,
-        "color": 7
-      },
-      "id": "b34a109f-3299-466c-a953-67605d35551e",
-      "name": "Sticky · MCP server",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        196,
-        -143
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Toolbox\nCalendar · Gmail · Sheets · web search · Supabase · calculator.",
-        "height": 447,
-        "width": 883,
-        "color": 7
-      },
-      "id": "429c3b7a-e9da-478a-9567-b61462714915",
-      "name": "Sticky · Toolbox",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        604,
-        -143
-      ]
     }
   ],
   "connections": {
@@ -342,6 +342,8 @@
     "binaryMode": "separate",
     "availableInMCP": false,
     "timeSavedMode": "fixed",
-    "callerPolicy": "workflowsFromSameOwner"
-  }
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

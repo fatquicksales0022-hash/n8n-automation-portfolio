@@ -3,6 +3,54 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Call ended\nVapi end-of-call report hits the webhook.",
+        "height": 607,
+        "width": 368,
+        "color": 5
+      },
+      "id": "662bd580-3fa7-46c6-81b8-45592bf77323",
+      "name": "Sticky · Call ended",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -127
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Fetch & normalize\nWait, pull the transcript, flatten the fields.",
+        "height": 607,
+        "width": 593,
+        "color": 2
+      },
+      "id": "5804290d-8c42-4431-afcd-b0c4b6477604",
+      "name": "Sticky · Fetch & normalize",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        308,
+        -127
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Log & route\nLog every call to the sheet → qualified leads get an email; opt-outs are auto-added to the do-not-call list.",
+        "height": 607,
+        "width": 586,
+        "color": 7
+      },
+      "id": "1f733eb6-9766-49de-97b5-269e719e694d",
+      "name": "Sticky · Log & route",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        901,
+        -127
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "outbound-logger",
         "options": {}
@@ -60,7 +108,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        624,
+        592,
         0
       ],
       "id": "32fa5ad8-80d2-4406-bf3e-2e52a90e8eae",
@@ -74,12 +122,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const call = $input.first().json;\n\n// structuredOutputs live under artifact for web calls — check there first\nconst so = call.artifact?.structuredOutputs || call.structuredOutputs || call.analysis?.structuredOutputs || {};\n// grab the first (only) output's result, no UUID hardcoding\nconst a = Object.values(so)[0]?.result || {};\n\nreturn [{\n  json: {\n    // --- call metadata ---\n    call_id:         call.id || '',\n    ended_at:        call.endedAt || '',\n    ended_reason:    call.endedReason || '',\n    customer_number: call.customer?.number || '',\n    recording_url:   call.recordingUrl || call.artifact?.recordingUrl || '',\n    transcript:      call.transcript || call.artifact?.transcript || '',\n    cost:            call.cost || '',\n    // --- call_analysis (flattened) ---\n    contact_confirmed:            a.contact_confirmed ?? '',\n    sentiment:                    a.sentiment || '',\n    needs:                        a.needs || '',\n    opportunity_product:          a.opportunity_product || '',\n    opportunity_quantity:         a.opportunity_quantity || '',\n    opportunity_budget:           a.opportunity_budget || '',\n    opportunity_timeframe:        a.opportunity_timeframe || '',\n    opportunity_location:         a.opportunity_location || '',\n    opportunity_follow_up_method: a.opportunity_follow_up_method || '',\n    prior_rep:                    a.prior_rep || '',\n    rep_follow_up:                a.rep_follow_up ?? '',\n    outcome_tag:                  a.outcome_tag || '',\n    opt_out:                      a.opt_out ?? '',\n    summary:                      a.summary || ''\n  }\n}];"
+        "jsCode": "const call = $input.first().json;\n\n// structuredOutputs live under artifact for web calls - check there first\nconst so = call.artifact?.structuredOutputs || call.structuredOutputs || call.analysis?.structuredOutputs || {};\n// grab the first (only) output's result, no UUID hardcoding\nconst a = Object.values(so)[0]?.result || {};\n\nreturn [{\n  json: {\n    // --- call metadata ---\n    call_id:         call.id || '',\n    ended_at:        call.endedAt || '',\n    ended_reason:    call.endedReason || '',\n    customer_number: call.customer?.number || '',\n    recording_url:   call.recordingUrl || call.artifact?.recordingUrl || '',\n    transcript:      call.transcript || call.artifact?.transcript || '',\n    cost:            call.cost || '',\n    // --- call_analysis (flattened) ---\n    contact_confirmed:            a.contact_confirmed ?? '',\n    sentiment:                    a.sentiment || '',\n    needs:                        a.needs || '',\n    opportunity_product:          a.opportunity_product || '',\n    opportunity_quantity:         a.opportunity_quantity || '',\n    opportunity_budget:           a.opportunity_budget || '',\n    opportunity_timeframe:        a.opportunity_timeframe || '',\n    opportunity_location:         a.opportunity_location || '',\n    opportunity_follow_up_method: a.opportunity_follow_up_method || '',\n    prior_rep:                    a.prior_rep || '',\n    rep_follow_up:                a.rep_follow_up ?? '',\n    outcome_tag:                  a.outcome_tag || '',\n    opt_out:                      a.opt_out ?? '',\n    summary:                      a.summary || ''\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        832,
+        784,
         0
       ],
       "id": "f6d26cad-e940-4c66-9bf8-5909bdacf871",
@@ -342,7 +390,7 @@
       "typeVersion": 4.7,
       "position": [
         1104,
-        -80
+        -32
       ],
       "id": "a0764cbb-6a1d-488a-9216-fe124b882937",
       "name": "Append row in sheet",
@@ -390,8 +438,8 @@
     {
       "parameters": {
         "sendTo": "you@example.com",
-        "subject": "={{ 'New lead [' + $json.outcome_tag.toUpperCase() + '] — ' + $json.opportunity_product }}",
-        "message": "={{ (() => {\n  const tag = ($json.outcome_tag || '').toLowerCase();\n  const color = tag==='hot' ? '#e11d48' : tag==='warm' ? '#f59e0b' : tag==='future' ? '#3b82f6' : '#64748b';\n  const row = (l,v) => `<tr><td style=\"padding:5px 0;color:#64748b;font-size:13px;width:120px;\">${l}</td><td style=\"padding:5px 0;color:#0f172a;font-size:14px;font-weight:600;\">${v || '—'}</td></tr>`;\n  const label = (t) => `<div style=\"font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin:20px 0 6px;font-weight:700;\">${t}</div>`;\n  return `\n<div style=\"font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f1f5f9;padding:20px;\">\n  <div style=\"background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;\">\n    <div style=\"background:${color};padding:18px 24px;\">\n      <div style=\"color:#fff;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.9;\">New Lead</div>\n      <div style=\"color:#fff;font-size:22px;font-weight:800;margin-top:2px;\">${($json.outcome_tag||'').toUpperCase()} &nbsp;·&nbsp; ${$json.sentiment||''}</div>\n    </div>\n    <div style=\"padding:8px 24px 20px;\">\n      ${label('Opportunity')}\n      <table style=\"width:100%;border-collapse:collapse;\">\n        ${row('Product',$json.opportunity_product)}\n        ${row('Quantity',$json.opportunity_quantity)}\n        ${row('Budget',$json.opportunity_budget)}\n        ${row('Timeframe',$json.opportunity_timeframe)}\n        ${row('Location',$json.opportunity_location)}\n        ${row('Follow-up',$json.opportunity_follow_up_method)}\n      </table>\n      ${label('Rep')}\n      <table style=\"width:100%;border-collapse:collapse;\">\n        ${row('Prior rep',$json.prior_rep)}\n        ${row('Wants follow-up',$json.rep_follow_up ? 'Yes' : 'No')}\n      </table>\n      ${label('Summary')}\n      <div style=\"font-size:14px;color:#334155;line-height:1.6;\">${$json.summary||''}</div>\n      <div style=\"margin:22px 0 4px;\">\n        <a href=\"${$json.recording_url}\" style=\"display:inline-block;background:#0f172a;color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:11px 20px;border-radius:8px;\">▶ Play recording</a>\n      </div>\n      ${label('Transcript')}\n      <div style=\"white-space:pre-wrap;font-size:12px;color:#475569;line-height:1.55;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;\">${$json.transcript||''}</div>\n    </div>\n  </div>\n</div>` })() }}",
+        "subject": "={{ 'New lead [' + $json.outcome_tag.toUpperCase() + '] - ' + $json.opportunity_product }}",
+        "message": "={{ (() => {\n  const tag = ($json.outcome_tag || '').toLowerCase();\n  const color = tag==='hot' ? '#e11d48' : tag==='warm' ? '#f59e0b' : tag==='future' ? '#3b82f6' : '#64748b';\n  const row = (l,v) => `<tr><td style=\"padding:5px 0;color:#64748b;font-size:13px;width:120px;\">${l}</td><td style=\"padding:5px 0;color:#0f172a;font-size:14px;font-weight:600;\">${v || '-'}</td></tr>`;\n  const label = (t) => `<div style=\"font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin:20px 0 6px;font-weight:700;\">${t}</div>`;\n  return `\n<div style=\"font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f1f5f9;padding:20px;\">\n  <div style=\"background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;\">\n    <div style=\"background:${color};padding:18px 24px;\">\n      <div style=\"color:#fff;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.9;\">New Lead</div>\n      <div style=\"color:#fff;font-size:22px;font-weight:800;margin-top:2px;\">${($json.outcome_tag||'').toUpperCase()} &nbsp;?&nbsp; ${$json.sentiment||''}</div>\n    </div>\n    <div style=\"padding:8px 24px 20px;\">\n      ${label('Opportunity')}\n      <table style=\"width:100%;border-collapse:collapse;\">\n        ${row('Product',$json.opportunity_product)}\n        ${row('Quantity',$json.opportunity_quantity)}\n        ${row('Budget',$json.opportunity_budget)}\n        ${row('Timeframe',$json.opportunity_timeframe)}\n        ${row('Location',$json.opportunity_location)}\n        ${row('Follow-up',$json.opportunity_follow_up_method)}\n      </table>\n      ${label('Rep')}\n      <table style=\"width:100%;border-collapse:collapse;\">\n        ${row('Prior rep',$json.prior_rep)}\n        ${row('Wants follow-up',$json.rep_follow_up ? 'Yes' : 'No')}\n      </table>\n      ${label('Summary')}\n      <div style=\"font-size:14px;color:#334155;line-height:1.6;\">${$json.summary||''}</div>\n      <div style=\"margin:22px 0 4px;\">\n        <a href=\"${$json.recording_url}\" style=\"display:inline-block;background:#0f172a;color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:11px 20px;border-radius:8px;\">? Play recording</a>\n      </div>\n      ${label('Transcript')}\n      <div style=\"white-space:pre-wrap;font-size:12px;color:#475569;line-height:1.55;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;\">${$json.transcript||''}</div>\n    </div>\n  </div>\n</div>` })() }}",
         "options": {
           "appendAttribution": false
         }
@@ -520,54 +568,6 @@
         }
       },
       "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "content": "## 📞 FeedbackVoice - Outbound Call Logger\nReceives Vapi call events -> waits for call end -> fetches the transcript/outcome -> logs to Sheets + adds opt-outs to a Do-Not-Call list. Backend for the outbound B2B feedback voice bot.\n**Vapi - Google Sheets - webhook**",
-        "height": 655,
-        "width": 378,
-        "color": 7
-      },
-      "id": "77e95bca-f524-45b5-b0de-acbfaad584ab",
-      "name": "Sticky · Call ended",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -64,
-        -176
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Fetch & normalize\nWait, pull the transcript, flatten the fields.",
-        "height": 655,
-        "width": 593,
-        "color": 2
-      },
-      "id": "ec8bd02f-e8af-4054-8f40-78e5bd9b669c",
-      "name": "Sticky · Fetch & normalize",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        320,
-        -176
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Log & route\nLog every call to the sheet → qualified leads get an email; opt-outs are auto-added to the do-not-call list.",
-        "height": 655,
-        "width": 576,
-        "color": 7
-      },
-      "id": "26d036a0-63b4-4c79-8c0d-438198e972cf",
-      "name": "Sticky · Log & route",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        912,
-        -176
-      ]
     }
   ],
   "connections": {
@@ -662,6 +662,677 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": {
+    "updatedAt": "2026-07-24T07:55:10.006Z",
+    "createdAt": "2026-07-24T07:55:10.006Z",
+    "versionId": "1b2f44c2-ed46-43d2-87b8-e0a1bff2709b",
+    "workflowId": "VAg5Nbnmg9zsk2sl",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## 📞 FeedbackVoice - Outbound Call Logger\nReceives Vapi call events -> waits for call end -> fetches the transcript/outcome -> logs to Sheets + adds opt-outs to a Do-Not-Call list. Backend for the outbound B2B feedback voice bot.\n**Vapi - Google Sheets - webhook**",
+          "height": 655,
+          "width": 378,
+          "color": 7
+        },
+        "id": "77e95bca-f524-45b5-b0de-acbfaad584ab",
+        "name": "Sticky ? Call ended",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -64,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Fetch & normalize\nWait, pull the transcript, flatten the fields.",
+          "height": 655,
+          "width": 593,
+          "color": 2
+        },
+        "id": "ec8bd02f-e8af-4054-8f40-78e5bd9b669c",
+        "name": "Sticky ? Fetch & normalize",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          320,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Log & route\nLog every call to the sheet → qualified leads get an email; opt-outs are auto-added to the do-not-call list.",
+          "height": 655,
+          "width": 576,
+          "color": 7
+        },
+        "id": "26d036a0-63b4-4c79-8c0d-438198e972cf",
+        "name": "Sticky ? Log & route",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          912,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "outbound-logger",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "10cd045e-5ff8-4d51-8acf-efd41bef8bc7",
+        "name": "Webhook",
+        "webhookId": "c8ea4894-26df-4e74-bbe6-f35f93cb467a"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "3e88990a-3974-44f1-9e6b-d34cc23f52b0",
+                "leftValue": "={{ $json.body.message.type }}",
+                "rightValue": "=end-of-call-report",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          416,
+          0
+        ],
+        "id": "5f4cc228-e538-4458-920e-b1591dba42bf",
+        "name": "Filter"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.vapi.ai/call/{{ $json.headers['x-call-id'] }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          592,
+          0
+        ],
+        "id": "32fa5ad8-80d2-4406-bf3e-2e52a90e8eae",
+        "name": "HTTP Request",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "mV2e0zHo28aBSvle",
+            "name": "Vapi Header"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const call = $input.first().json;\n\n// structuredOutputs live under artifact for web calls - check there first\nconst so = call.artifact?.structuredOutputs || call.structuredOutputs || call.analysis?.structuredOutputs || {};\n// grab the first (only) output's result, no UUID hardcoding\nconst a = Object.values(so)[0]?.result || {};\n\nreturn [{\n  json: {\n    // --- call metadata ---\n    call_id:         call.id || '',\n    ended_at:        call.endedAt || '',\n    ended_reason:    call.endedReason || '',\n    customer_number: call.customer?.number || '',\n    recording_url:   call.recordingUrl || call.artifact?.recordingUrl || '',\n    transcript:      call.transcript || call.artifact?.transcript || '',\n    cost:            call.cost || '',\n    // --- call_analysis (flattened) ---\n    contact_confirmed:            a.contact_confirmed ?? '',\n    sentiment:                    a.sentiment || '',\n    needs:                        a.needs || '',\n    opportunity_product:          a.opportunity_product || '',\n    opportunity_quantity:         a.opportunity_quantity || '',\n    opportunity_budget:           a.opportunity_budget || '',\n    opportunity_timeframe:        a.opportunity_timeframe || '',\n    opportunity_location:         a.opportunity_location || '',\n    opportunity_follow_up_method: a.opportunity_follow_up_method || '',\n    prior_rep:                    a.prior_rep || '',\n    rep_follow_up:                a.rep_follow_up ?? '',\n    outcome_tag:                  a.outcome_tag || '',\n    opt_out:                      a.opt_out ?? '',\n    summary:                      a.summary || ''\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          784,
+          0
+        ],
+        "id": "f6d26cad-e940-4c66-9bf8-5909bdacf871",
+        "name": "Normalizer"
+      },
+      {
+        "parameters": {
+          "amount": 90
+        },
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          208,
+          0
+        ],
+        "id": "5723e24b-7b4b-4891-9a9d-acb718b52056",
+        "name": "Wait",
+        "webhookId": "9d895ffa-d475-4f91-bb38-27b6440e7a56"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "YOUR_SHEET_ID",
+            "mode": "list",
+            "cachedResultName": "YOUR_SHEET_ID"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {
+              "ended_at": "={{ $json.ended_at }}",
+              "outcome_tag": "={{ $json.outcome_tag }}",
+              "contact_confirmed": "={{ $json.contact_confirmed }}",
+              "sentiment": "={{ $json.sentiment }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "ended_at",
+                "displayName": "ended_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "outcome_tag",
+                "displayName": "outcome_tag",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "sentiment",
+                "displayName": "sentiment",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "contact_confirmed",
+                "displayName": "contact_confirmed",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "needs",
+                "displayName": "needs",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opportunity_product",
+                "displayName": "opportunity_product",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opportunity_quantity",
+                "displayName": "opportunity_quantity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opportunity_budget",
+                "displayName": "opportunity_budget",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opportunity_timeframe",
+                "displayName": "opportunity_timeframe",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opportunity_location",
+                "displayName": "opportunity_location",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opportunity_follow_up_method",
+                "displayName": "opportunity_follow_up_method",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "prior_rep",
+                "displayName": "prior_rep",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "rep_follow_up",
+                "displayName": "rep_follow_up",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "opt_out",
+                "displayName": "opt_out",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "summary",
+                "displayName": "summary",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "customer_number",
+                "displayName": "customer_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "recording_url",
+                "displayName": "recording_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "transcript",
+                "displayName": "transcript",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "cost",
+                "displayName": "cost",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ended_reason",
+                "displayName": "ended_reason",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "call_id",
+                "displayName": "call_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1104,
+          -32
+        ],
+        "id": "a0764cbb-6a1d-488a-9216-fe124b882937",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "yMqkk4M0kF50KIC0",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ee9d4972-e9e1-4657-a9a4-c3ee8171dba9",
+                "leftValue": "={{ ['hot','warm','future'].includes($json.outcome_tag) }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          1104,
+          128
+        ],
+        "id": "2dfe2645-ed59-4257-9d3d-2b00ff632c12",
+        "name": "If Qualified"
+      },
+      {
+        "parameters": {
+          "sendTo": "you@example.com",
+          "subject": "={{ 'New lead [' + $json.outcome_tag.toUpperCase() + '] - ' + $json.opportunity_product }}",
+          "message": "={{ (() => {\n  const tag = ($json.outcome_tag || '').toLowerCase();\n  const color = tag==='hot' ? '#e11d48' : tag==='warm' ? '#f59e0b' : tag==='future' ? '#3b82f6' : '#64748b';\n  const row = (l,v) => `<tr><td style=\"padding:5px 0;color:#64748b;font-size:13px;width:120px;\">${l}</td><td style=\"padding:5px 0;color:#0f172a;font-size:14px;font-weight:600;\">${v || '-'}</td></tr>`;\n  const label = (t) => `<div style=\"font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin:20px 0 6px;font-weight:700;\">${t}</div>`;\n  return `\n<div style=\"font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f1f5f9;padding:20px;\">\n  <div style=\"background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;\">\n    <div style=\"background:${color};padding:18px 24px;\">\n      <div style=\"color:#fff;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.9;\">New Lead</div>\n      <div style=\"color:#fff;font-size:22px;font-weight:800;margin-top:2px;\">${($json.outcome_tag||'').toUpperCase()} &nbsp;?&nbsp; ${$json.sentiment||''}</div>\n    </div>\n    <div style=\"padding:8px 24px 20px;\">\n      ${label('Opportunity')}\n      <table style=\"width:100%;border-collapse:collapse;\">\n        ${row('Product',$json.opportunity_product)}\n        ${row('Quantity',$json.opportunity_quantity)}\n        ${row('Budget',$json.opportunity_budget)}\n        ${row('Timeframe',$json.opportunity_timeframe)}\n        ${row('Location',$json.opportunity_location)}\n        ${row('Follow-up',$json.opportunity_follow_up_method)}\n      </table>\n      ${label('Rep')}\n      <table style=\"width:100%;border-collapse:collapse;\">\n        ${row('Prior rep',$json.prior_rep)}\n        ${row('Wants follow-up',$json.rep_follow_up ? 'Yes' : 'No')}\n      </table>\n      ${label('Summary')}\n      <div style=\"font-size:14px;color:#334155;line-height:1.6;\">${$json.summary||''}</div>\n      <div style=\"margin:22px 0 4px;\">\n        <a href=\"${$json.recording_url}\" style=\"display:inline-block;background:#0f172a;color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:11px 20px;border-radius:8px;\">? Play recording</a>\n      </div>\n      ${label('Transcript')}\n      <div style=\"white-space:pre-wrap;font-size:12px;color:#475569;line-height:1.55;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;\">${$json.transcript||''}</div>\n    </div>\n  </div>\n</div>` })() }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1312,
+          128
+        ],
+        "id": "0eadd00d-2a8c-46e6-aa63-90832e2c0e4d",
+        "name": "Send a message",
+        "webhookId": "8e10c62f-cd55-420b-a3e3-756f14f229c2",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "dku6asR2rjX2ypmP",
+            "name": "Gmail account Local"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "a8998321-4837-4b8b-843b-e6a30e884c4a",
+                "leftValue": "={{ $json.opt_out === true }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          1104,
+          320
+        ],
+        "id": "7a140e45-c2f6-4557-bb34-03f4d7302604",
+        "name": "If Opt-Out"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "YOUR_SHEET_ID",
+            "mode": "list",
+            "cachedResultName": "YOUR_SHEET_ID"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 247554161,
+            "mode": "list",
+            "cachedResultName": "Do Not Call",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=247554161"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "phone": "={{ $json.customer_number }}",
+              "reason": "=opt-out during call",
+              "date": "={{ $now.toFormat('yyyy-LL-dd') }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "phone",
+                "displayName": "phone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "reason",
+                "displayName": "reason",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1312,
+          320
+        ],
+        "id": "b8dae22b-5d50-42d9-981c-55ddcd1f0033",
+        "name": "Add to DNC",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "yMqkk4M0kF50KIC0",
+            "name": "Google Sheets account"
+          }
+        },
+        "onError": "continueRegularOutput"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Normalizer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalizer": {
+        "main": [
+          [
+            {
+              "node": "If Qualified",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "If Opt-Out",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Qualified": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Opt-Out": {
+        "main": [
+          [
+            {
+              "node": "Add to DNC",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Patrick Sales",
+    "name": null,
+    "description": null,
+    "autosaved": false
   }
 }

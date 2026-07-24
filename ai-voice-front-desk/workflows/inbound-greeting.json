@@ -3,6 +3,38 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Inbound call\nTwilio hits the webhook when the phone rings.",
+        "height": 255,
+        "width": 326,
+        "color": 5
+      },
+      "id": "c6b85724-6653-43ba-8ab7-fed68053a624",
+      "name": "Sticky · Inbound call",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -47
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Greet & hand off\nReturns TwiML that greets the caller and routes them to the AI voice agent.",
+        "height": 255,
+        "width": 325,
+        "color": 7
+      },
+      "id": "ffe36ef2-34e3-41c9-8ae4-64fb3c2933e2",
+      "name": "Sticky · Greet & hand off",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        266,
+        -47
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "voice-inbound",
         "responseMode": "responseNode",
@@ -12,7 +44,7 @@
       "typeVersion": 2.1,
       "position": [
         0,
-        0
+        48
       ],
       "id": "4779d6d5-c733-4534-8371-a616914a76c3",
       "name": "Webhook",
@@ -21,7 +53,7 @@
     {
       "parameters": {
         "respondWith": "text",
-        "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">Hi, thanks for calling. This is your A I front desk. How can I help you today?</Say>\n  <Gather input=\"speech\" action=\"https://YOUR_PUBLIC_N8N_URL/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">Sorry, I didn't catch that. Goodbye.</Say>\n</Response>",
+        "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">Hi, thanks for calling. This is your A I front desk. How can I help you today?</Say>\n  <Gather input=\"speech\" action=\"https://patrick-n8n.onrender.com/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">Sorry, I didn't catch that. Goodbye.</Say>\n</Response>",
         "options": {
           "responseHeaders": {
             "entries": [
@@ -37,42 +69,10 @@
       "typeVersion": 1.5,
       "position": [
         416,
-        0
+        48
       ],
       "id": "db0289f3-9a89-4665-a6c1-46db5752d1b7",
       "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
-        "content": "## 👋 VFD - Inbound Greeting\nTwilio entry point: answers the call and returns the greeting TwiML that kicks off the AI voice flow.\n**Twilio TwiML - webhook**",
-        "height": 255,
-        "width": 326,
-        "color": 7
-      },
-      "id": "9aba63d8-8954-434c-9b7a-0c7dc054854f",
-      "name": "Sticky · Inbound call",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -64,
-        -96
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Greet & hand off\nReturns TwiML that greets the caller and routes them to the AI voice agent.",
-        "height": 255,
-        "width": 325,
-        "color": 7
-      },
-      "id": "c07d2e97-cf84-40d1-9828-88118bf50584",
-      "name": "Sticky · Greet & hand off",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        272,
-        -96
-      ]
     }
   ],
   "connections": {
@@ -91,6 +91,106 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": {
+    "updatedAt": "2026-07-24T07:55:15.050Z",
+    "createdAt": "2026-07-24T07:55:15.050Z",
+    "versionId": "2ea055c8-ea3a-416f-a375-c137f737a51d",
+    "workflowId": "x9EOYOCctMse690F",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## 👋 VFD - Inbound Greeting\nTwilio entry point: answers the call and returns the greeting TwiML that kicks off the AI voice flow.\n**Twilio TwiML - webhook**",
+          "height": 255,
+          "width": 326,
+          "color": 7
+        },
+        "id": "9aba63d8-8954-434c-9b7a-0c7dc054854f",
+        "name": "Sticky � Inbound call",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -64,
+          -96
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Greet & hand off\nReturns TwiML that greets the caller and routes them to the AI voice agent.",
+          "height": 255,
+          "width": 325,
+          "color": 7
+        },
+        "id": "c07d2e97-cf84-40d1-9828-88118bf50584",
+        "name": "Sticky � Greet & hand off",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -96
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "voice-inbound",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          48
+        ],
+        "id": "4779d6d5-c733-4534-8371-a616914a76c3",
+        "name": "Webhook",
+        "webhookId": "58a83c46-c734-44b1-bb26-56aafe26c05c"
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">Hi, thanks for calling. This is your A I front desk. How can I help you today?</Say>\n  <Gather input=\"speech\" action=\"https://patrick-n8n.onrender.com/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">Sorry, I didn't catch that. Goodbye.</Say>\n</Response>",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "text/xml"
+                }
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          416,
+          48
+        ],
+        "id": "db0289f3-9a89-4665-a6c1-46db5752d1b7",
+        "name": "Respond to Webhook"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Patrick Sales",
+    "name": null,
+    "description": null,
+    "autosaved": false
   }
 }

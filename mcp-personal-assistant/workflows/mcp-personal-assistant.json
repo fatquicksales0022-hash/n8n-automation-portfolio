@@ -3,6 +3,54 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Chat message",
+        "height": 463,
+        "width": 203,
+        "color": 5
+      },
+      "id": "5cdd732a-72e4-4aa4-95b2-2f82847fe119",
+      "name": "Sticky · Chat message",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -79
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Reason\nAgent + memory decides what to do.",
+        "height": 463,
+        "width": 208,
+        "color": 3
+      },
+      "id": "c0df6f8e-4e6d-4d86-84b8-ed3317a8ae6a",
+      "name": "Sticky · Reason",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        143,
+        -79
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Reach tools over MCP\nCalls the toolbox workflow, gating irreversible actions.",
+        "height": 463,
+        "width": 240,
+        "color": 6
+      },
+      "id": "fdd3f594-de23-4ada-bfad-008984ead5b0",
+      "name": "Sticky · Reach tools over MCP",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        351,
+        -79
+      ]
+    },
+    {
+      "parameters": {
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
@@ -18,7 +66,7 @@
     {
       "parameters": {
         "options": {
-          "systemMessage": "=You are a personal assistant. You have the following tools (provided via MCP).\nPrefer using a tool over guessing whenever a request touches one of these areas:\n\n- Calendar — read the user's upcoming events, and create new events.\n- Email (Gmail) — send an email on the user's behalf.\n- Spreadsheets (Google Sheets) — read rows from a sheet.\n- Notes (Supabase) — save notes, reminders, or facts the user wants remembered,\n  and retrieve previously saved notes.\n- Web search (SerpApi) — look up current or factual information on the web.\n- Hacker News — fetch a tech / startup news article by its ID.\n- Calculator — do exact arithmetic.\n\nOperating rules:\n- Call one tool at a time, and read its result before deciding the next step.\n- ALWAYS confirm before any irreversible or outbound action — sending an email\n  or creating a calendar event — by restating exactly what you will do\n  (recipient, subject, date/time, etc.) and waiting for a clear \"yes\".\n  Reading, searching, calculating, saving a note, and retrieving notes do NOT\n  need confirmation.\n- For anything time-sensitive or factual you're unsure about, use web search\n  rather than relying on memory, and cite what you found.\n- When the user asks what they saved or to recall something, use the notes\n  retrieval tool rather than guessing. After saving a note, briefly confirm\n  what you stored.\n- If no tool fits, answer directly. When an answer depends on a tool's result,\n  say which tool you used.\n- Be concise and friendly."
+          "systemMessage": "=You are a personal assistant. You have the following tools (provided via MCP).\nPrefer using a tool over guessing whenever a request touches one of these areas:\n\n- Calendar - read the user's upcoming events, and create new events.\n- Email (Gmail) - send an email on the user's behalf.\n- Spreadsheets (Google Sheets) - read rows from a sheet.\n- Notes (Supabase) - save notes, reminders, or facts the user wants remembered,\n  and retrieve previously saved notes.\n- Web search (SerpApi) - look up current or factual information on the web.\n- Hacker News - fetch a tech / startup news article by its ID.\n- Calculator - do exact arithmetic.\n\nOperating rules:\n- Call one tool at a time, and read its result before deciding the next step.\n- ALWAYS confirm before any irreversible or outbound action - sending an email\n  or creating a calendar event - by restating exactly what you will do\n  (recipient, subject, date/time, etc.) and waiting for a clear \"yes\".\n  Reading, searching, calculating, saving a note, and retrieving notes do NOT\n  need confirmation.\n- For anything time-sensitive or factual you're unsure about, use web search\n  rather than relying on memory, and cite what you found.\n- When the user asks what they saved or to recall something, use the notes\n  retrieval tool rather than guessing. After saving a note, briefly confirm\n  what you stored.\n- If no tool fits, answer directly. When an answer depends on a tool's result,\n  say which tool you used.\n- Be concise and friendly."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -82,54 +130,6 @@
       ],
       "id": "52271720-c635-4bb4-8c26-f0463654b2d6",
       "name": "MCP Client"
-    },
-    {
-      "parameters": {
-        "content": "## 🧠 MCP Personal Assistant\nChat agent that consumes the MCP toolbox as a client - a conversational front end over the same Calendar/Gmail/Sheets/Supabase tools.\n**OpenAI agent - MCP client - Supabase**",
-        "height": 463,
-        "width": 203,
-        "color": 7
-      },
-      "id": "d2d3ed7d-0b3d-4e73-8942-be6ceb19f9c8",
-      "name": "Sticky · Chat message",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -79
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Reason\nAgent + memory decides what to do.",
-        "height": 463,
-        "width": 208,
-        "color": 3
-      },
-      "id": "29d22dd1-ca4c-4ed4-a692-bb37e14d8bb4",
-      "name": "Sticky · Reason",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        143,
-        -79
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Reach tools over MCP\nCalls the toolbox workflow, gating irreversible actions.",
-        "height": 463,
-        "width": 240,
-        "color": 6
-      },
-      "id": "06568b8d-c680-4c5c-9454-050ee205a5de",
-      "name": "Sticky · Reach tools over MCP",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        351,
-        -79
-      ]
     }
   ],
   "connections": {
@@ -181,6 +181,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

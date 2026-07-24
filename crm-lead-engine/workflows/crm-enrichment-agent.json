@@ -3,6 +3,70 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Daily schedule",
+        "height": 655,
+        "width": 547,
+        "color": 5
+      },
+      "id": "32abcf5e-eaf0-4b71-8e31-9449aa252e1d",
+      "name": "Sticky · Daily schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        212,
+        -383
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Pull & clean contacts\nFetch HubSpot contacts, split, filter, normalize.",
+        "height": 655,
+        "width": 869,
+        "color": 2
+      },
+      "id": "085a97cf-bd42-446a-b771-d6ed291fe2d0",
+      "name": "Sticky · Pull & clean contacts",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        759,
+        -383
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Enrich + score\nInfer company / seniority / segment from what's already there; score data quality.",
+        "height": 655,
+        "width": 575,
+        "color": 3
+      },
+      "id": "e2bfa510-ba93-4a72-83aa-aa437c64630a",
+      "name": "Sticky · Enrich + score",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1628,
+        -383
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Write back\nUpdate HubSpot + Slack digest.",
+        "height": 655,
+        "width": 388,
+        "color": 7
+      },
+      "id": "5c482bef-44d2-4771-9626-3cbd32b8a084",
+      "name": "Sticky · Write back",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2203,
+        -383
+      ]
+    },
+    {
+      "parameters": {
         "options": {}
       },
       "type": "n8n-nodes-base.splitInBatches",
@@ -113,12 +177,12 @@
             {
               "name": "data_quality_score",
               "type": "number",
-              "description": "0–100 integer, quality of the ORIGINAL record."
+              "description": "0-100 integer, quality of the ORIGINAL record."
             }
           ]
         },
         "options": {
-          "systemPromptTemplate": "=You are a CRM data-hygiene assistant. You clean and enrich ONE contact record using\nONLY the information provided plus what can be directly inferred from the email address.\n\nRules:\n1. Never invent facts you cannot infer. No fake phone numbers, no guessed real companies\n   beyond what the email domain tells you.\n2. Proper-case names: \"john smith\" -> \"John Smith\", \"SARA\" -> \"Sara\".\n3. If company is blank, infer it from the email domain (e.g. john@acmewidgets.com ->\n   \"Acme Widgets\"). Leave company blank for personal/free email providers.\n4. company_domain = the part after \"@\" in the email, lowercased — BUT return an empty\n   string (\"\") when the domain is a personal/free email provider. Treat these as personal:\n   gmail.com, googlemail.com, yahoo.com, ymail.com, hotmail.com, outlook.com, live.com,\n   msn.com, icloud.com, me.com, mac.com, aol.com, proton.me, protonmail.com, gmx.com,\n   zoho.com. For a personal provider, BOTH company_name AND company_domain MUST be \"\".\n5. seniority: infer from job title, exactly one of:\n   c_level, vp, director, manager, individual_contributor, unknown.\n   Mapping:\n   - c_level: CEO, CTO, CFO, COO, any \"Chief ...\" title, Founder, Co-Founder, President, Owner.\n   - vp: \"VP\", \"Vice President\", \"SVP\", \"EVP\".\n   - director: \"Director\", or any \"Head of ...\" title.\n   - manager: \"Manager\", \"Lead\", \"Supervisor\".\n   - individual_contributor: specialist, coordinator, associate, analyst, engineer,\n     representative, or any title with no leadership indicator.\n   - unknown: only when the job title is blank or genuinely unclassifiable.\n6. industry / segment: best guess from company + title; use \"unknown\" if not inferable.\n7. summary: one sentence describing who this contact is, based only on given data.\n8. data_quality_score: integer 0-100 reflecting how COMPLETE and CLEAN the ORIGINAL\n   record was (full name + company + title + valid business email = high; mostly blank = low).\n9. For anything you genuinely cannot determine, return an empty string (\"\") — except\n   industry/seniority/segment which use \"unknown\"."
+          "systemPromptTemplate": "=You are a CRM data-hygiene assistant. You clean and enrich ONE contact record using\nONLY the information provided plus what can be directly inferred from the email address.\n\nRules:\n1. Never invent facts you cannot infer. No fake phone numbers, no guessed real companies\n   beyond what the email domain tells you.\n2. Proper-case names: \"john smith\" -> \"John Smith\", \"SARA\" -> \"Sara\".\n3. If company is blank, infer it from the email domain (e.g. john@acmewidgets.com ->\n   \"Acme Widgets\"). Leave company blank for personal/free email providers.\n4. company_domain = the part after \"@\" in the email, lowercased - BUT return an empty\n   string (\"\") when the domain is a personal/free email provider. Treat these as personal:\n   gmail.com, googlemail.com, yahoo.com, ymail.com, hotmail.com, outlook.com, live.com,\n   msn.com, icloud.com, me.com, mac.com, aol.com, proton.me, protonmail.com, gmx.com,\n   zoho.com. For a personal provider, BOTH company_name AND company_domain MUST be \"\".\n5. seniority: infer from job title, exactly one of:\n   c_level, vp, director, manager, individual_contributor, unknown.\n   Mapping:\n   - c_level: CEO, CTO, CFO, COO, any \"Chief ...\" title, Founder, Co-Founder, President, Owner.\n   - vp: \"VP\", \"Vice President\", \"SVP\", \"EVP\".\n   - director: \"Director\", or any \"Head of ...\" title.\n   - manager: \"Manager\", \"Lead\", \"Supervisor\".\n   - individual_contributor: specialist, coordinator, associate, analyst, engineer,\n     representative, or any title with no leadership indicator.\n   - unknown: only when the job title is blank or genuinely unclassifiable.\n6. industry / segment: best guess from company + title; use \"unknown\" if not inferable.\n7. summary: one sentence describing who this contact is, based only on given data.\n8. data_quality_score: integer 0-100 reflecting how COMPLETE and CLEAN the ORIGINAL\n   record was (full name + company + title + valid business email = high; mostly blank = low).\n9. For anything you genuinely cannot determine, return an empty string (\"\") - except\n   industry/seniority/segment which use \"unknown\"."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
@@ -177,7 +241,7 @@
           "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "id"
         },
-        "text": "=🧹 CRM hygiene run complete — enriched {{ $json.count }} contacts. Avg data-quality score: {{ $json.avgScore }}/100. Seniority mix — {{ $json.segLine }}.",
+        "text": "=?? CRM hygiene run complete - enriched {{ $json.count }} contacts. Avg data-quality score: {{ $json.avgScore }}/100. Seniority mix - {{ $json.segLine }}.",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -356,70 +420,6 @@
           "name": "HubSpot Header Auth Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 🧩 Build 8 - CRM Enrichment & Scoring\nScheduled sweep of CRM contacts -> AI enriches + scores each against your ICP -> writes back to HubSpot, flags hot leads to Slack.\n**OpenAI - HubSpot API - Slack**",
-        "height": 655,
-        "width": 547,
-        "color": 7
-      },
-      "id": "7ab7df05-f2a8-4a90-956a-ba8731aab04f",
-      "name": "Sticky · Daily schedule",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        212,
-        -383
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Pull & clean contacts\nFetch HubSpot contacts, split, filter, normalize.",
-        "height": 655,
-        "width": 869,
-        "color": 2
-      },
-      "id": "aec0ce11-9b50-40a2-b614-f62f2b718194",
-      "name": "Sticky · Pull & clean contacts",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        759,
-        -383
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Enrich + score\nInfer company / seniority / segment from what's already there; score data quality.",
-        "height": 655,
-        "width": 575,
-        "color": 3
-      },
-      "id": "e4e78283-a5bc-4271-acef-b939478d3f50",
-      "name": "Sticky · Enrich + score",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1628,
-        -383
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Write back\nUpdate HubSpot + Slack digest.",
-        "height": 655,
-        "width": 388,
-        "color": 7
-      },
-      "id": "608f7c41-91eb-4c94-891a-9099f541773d",
-      "name": "Sticky · Write back",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        2203,
-        -383
-      ]
     }
   ],
   "connections": {
@@ -555,6 +555,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

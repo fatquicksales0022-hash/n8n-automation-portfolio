@@ -3,6 +3,54 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Schedule",
+        "height": 687,
+        "width": 368,
+        "color": 5
+      },
+      "id": "b48bd9ab-df95-4932-8632-53b2200d6537",
+      "name": "Sticky · Schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1204,
+        17
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Sync Drive\nList + download new files; SQL check skips anything already ingested.",
+        "height": 687,
+        "width": 600,
+        "color": 2
+      },
+      "id": "0203ff1d-4d31-4fcc-9069-326363b2d661",
+      "name": "Sticky · Sync Drive",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1572,
+        17
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Chunk + embed → store\nSplit, embed, and write to the vector store.",
+        "height": 687,
+        "width": 515,
+        "color": 3
+      },
+      "id": "0ef946e1-0316-4957-894c-b9b8073bc134",
+      "name": "Sticky · Chunk + embed → store",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2172,
+        17
+      ]
+    },
+    {
+      "parameters": {
         "rule": {
           "interval": [
             {
@@ -46,7 +94,7 @@
       "credentials": {
         "googleDriveOAuth2Api": {
           "id": "7qbp6h6nyqUmVNmI",
-          "name": "Google Drive account"
+          "name": "Google Drive account Local"
         }
       }
     },
@@ -71,7 +119,7 @@
       "credentials": {
         "googleDriveOAuth2Api": {
           "id": "7qbp6h6nyqUmVNmI",
-          "name": "Google Drive account"
+          "name": "Google Drive account Local"
         }
       }
     },
@@ -199,54 +247,6 @@
           "name": "Supabase Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 📥 Build 4 - RAG Ingestion (Drive -> Supabase)\nWatches a Google Drive folder -> extracts file text -> recursive chunking -> embeds -> Supabase vector store. Keeps the support chatbot's knowledge fresh.\n**Google Drive - text-embedding - Supabase**",
-        "height": 687,
-        "width": 368,
-        "color": 7
-      },
-      "id": "03d004c0-f4ab-47dc-8dad-073a5181f589",
-      "name": "Sticky · Schedule",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1204,
-        17
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Sync Drive\nList + download new files; SQL check skips anything already ingested.",
-        "height": 687,
-        "width": 600,
-        "color": 2
-      },
-      "id": "abda534a-2f78-4696-96be-91402f199c59",
-      "name": "Sticky · Sync Drive",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1572,
-        17
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Chunk + embed → store\nSplit, embed, and write to the vector store.",
-        "height": 687,
-        "width": 515,
-        "color": 3
-      },
-      "id": "f2efbd0f-1d52-4501-9108-7d2823f5876c",
-      "name": "Sticky · Chunk + embed → store",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        2172,
-        17
-      ]
     }
   ],
   "connections": {
@@ -342,6 +342,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

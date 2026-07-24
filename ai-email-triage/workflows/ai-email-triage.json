@@ -3,6 +3,86 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## 1 · Trigger\nNew email arrives (is:unread, not yet triaged).",
+        "height": 1071,
+        "width": 222,
+        "color": 5
+      },
+      "id": "dc4bf787-79fb-4e98-ae11-a69e4516cf39",
+      "name": "Sticky · 1 · Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        148,
+        -511
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2 · Normalize\nFlatten to from / subject / body.",
+        "height": 1071,
+        "width": 200,
+        "color": 2
+      },
+      "id": "6b137328-2ecb-4370-9f49-4b7e64bd35f5",
+      "name": "Sticky · 2 · Normalize",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        370,
+        -511
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3 · Classify with AI\nExtract category, priority, sentiment, suggested action.",
+        "height": 1071,
+        "width": 296,
+        "color": 3
+      },
+      "id": "9ffdc2ac-1fdf-4417-bb5d-29d745562301",
+      "name": "Sticky · 3 · Classify with AI",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        570,
+        -511
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4 · Route\nSwitch on the category.",
+        "height": 1071,
+        "width": 407,
+        "color": 6
+      },
+      "id": "f0382802-0a68-46b6-8960-9c69b342d4ea",
+      "name": "Sticky · 4 · Route",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        866,
+        -511
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 5 · Act & tag\nSlack the urgent, draft a reply for review, flag leads, file newsletters, bin spam — then tag 'triaged' so nothing is handled twice. Nothing is sent automatically.",
+        "height": 1071,
+        "width": 566,
+        "color": 7
+      },
+      "id": "0408df5d-4f4a-43e5-8c04-7a394a06c9d2",
+      "name": "Sticky · 5 · Act & tag",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1273,
+        -511
+      ]
+    },
+    {
+      "parameters": {
         "text": "=From: {{ $json.from }}\\nSubject: {{ $json.subject }}\\nBody: {{ $json.bodyTrimmed }}",
         "attributes": {
           "attributes": [
@@ -223,7 +303,7 @@
           "mode": "id",
           "value": "YOUR_SLACK_CHANNEL_ID"
         },
-        "text": "=🚨 Urgent email from {{ $('Normalize').first().json.from }}\nSubject: {{ $('Normalize').first().json.subject }}\nSummary: {{ $json.output.summary }}\nSuggested action: {{ $json.output.suggested_action }}",
+        "text": "=?? Urgent email from {{ $('Normalize').first().json.from }}\nSubject: {{ $('Normalize').first().json.subject }}\nSummary: {{ $json.output.summary }}\nSuggested action: {{ $json.output.suggested_action }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -296,7 +376,7 @@
         "messages": {
           "messageValues": [
             {
-              "message": "=You are drafting a reply on behalf of Patrick.\n\nWrite a reply to the email below. Constraints:\n- Match the sender's tone; default to warm but concise (3-6 sentences).\n- Address every question or request explicitly.\n- Do NOT invent commitments, prices, dates, or facts. If information is\n  missing, write a placeholder in [brackets] for the user to fill.\n- End with the signature: \"Patrick\".\n- Output only the email body — no subject line, no preamble.\n\n- For any yes/no question about features, pricing, or policies, do NOT assume the answer. Use a placeholder like \"[confirm: is onboarding included?]\" unless the answer is stated in the email."
+              "message": "=You are drafting a reply on behalf of Patrick.\n\nWrite a reply to the email below. Constraints:\n- Match the sender's tone; default to warm but concise (3-6 sentences).\n- Address every question or request explicitly.\n- Do NOT invent commitments, prices, dates, or facts. If information is\n  missing, write a placeholder in [brackets] for the user to fill.\n- End with the signature: \"Patrick\".\n- Output only the email body - no subject line, no preamble.\n\n- For any yes/no question about features, pricing, or policies, do NOT assume the answer. Use a placeholder like \"[confirm: is onboarding included?]\" unless the answer is stated in the email."
             }
           ]
         },
@@ -362,7 +442,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -383,7 +463,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -407,7 +487,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -428,7 +508,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -453,7 +533,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -477,7 +557,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -489,7 +569,7 @@
           "mode": "id",
           "value": "YOUR_SLACK_CHANNEL_ID"
         },
-        "text": "=💰 New sales lead from {{ $('Normalize').first().json.from }} — {{ $json.output.summary }}",
+        "text": "=?? New sales lead from {{ $('Normalize').first().json.from }} - {{ $json.output.summary }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -528,7 +608,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -552,7 +632,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -576,89 +656,9 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 📧 Build 6 - AI Email Triage\nEvery inbound Gmail is classified by AI, then routed - auto-drafts, labels, forwards, or escalates to Slack - based on intent.\n**OpenAI - Gmail - Slack**",
-        "height": 1071,
-        "width": 222,
-        "color": 7
-      },
-      "id": "d24aa5ef-2f42-4e0f-b596-99393f35831b",
-      "name": "Sticky · 1 · Trigger",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        148,
-        -511
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## 2 · Normalize\nFlatten to from / subject / body.",
-        "height": 1071,
-        "width": 200,
-        "color": 2
-      },
-      "id": "925f30f0-e3c3-48ca-a522-f86b3892e7ba",
-      "name": "Sticky · 2 · Normalize",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        370,
-        -511
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## 3 · Classify with AI\nExtract category, priority, sentiment, suggested action.",
-        "height": 1071,
-        "width": 296,
-        "color": 3
-      },
-      "id": "6f356091-13a8-4a73-984b-e722beb9707f",
-      "name": "Sticky · 3 · Classify with AI",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        570,
-        -511
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## 4 · Route\nSwitch on the category.",
-        "height": 1071,
-        "width": 407,
-        "color": 6
-      },
-      "id": "50ee5810-a4a8-4f4c-be3c-608dacd58adf",
-      "name": "Sticky · 4 · Route",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        866,
-        -511
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## 5 · Act & tag\nSlack the urgent, draft a reply for review, flag leads, file newsletters, bin spam — then tag 'triaged' so nothing is handled twice. Nothing is sent automatically.",
-        "height": 1071,
-        "width": 566,
-        "color": 7
-      },
-      "id": "22904de6-e789-4c1b-9dc6-692fea289ef1",
-      "name": "Sticky · 5 · Act & tag",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1273,
-        -511
-      ]
     }
   ],
   "connections": {
@@ -822,6 +822,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }

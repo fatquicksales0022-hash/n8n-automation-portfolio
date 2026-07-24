@@ -3,6 +3,70 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Call turn in\nTwilio posts each caller utterance.",
+        "height": 543,
+        "width": 252,
+        "color": 5
+      },
+      "id": "1e9fae93-781c-43b1-9895-1538e3bddb7e",
+      "name": "Sticky · Call turn in",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -175
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## AI voice agent (the brain)\nGPT-4o-mini + memory. Qualifies and books mid-call via the booking tool.",
+        "height": 543,
+        "width": 296,
+        "color": 3
+      },
+      "id": "20d21655-5050-4db1-ad31-31c16f927032",
+      "name": "Sticky · AI voice agent (the brain)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -175
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Transfer?\nDetects a request for a human.",
+        "height": 543,
+        "width": 354,
+        "color": 6
+      },
+      "id": "e1d0fb46-ee0c-4282-bf81-d9189d9cacf6",
+      "name": "Sticky · Transfer?",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        488,
+        -175
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Respond\nSpeaks the reply, or hands off to a live person.",
+        "height": 543,
+        "width": 309,
+        "color": 7
+      },
+      "id": "2e365063-76f7-481e-8a9f-b15c5acc7fee",
+      "name": "Sticky · Respond",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        842,
+        -175
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "voice-respond",
         "responseMode": "responseNode",
@@ -21,7 +85,7 @@
     {
       "parameters": {
         "respondWith": "text",
-        "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">{{ $json.output }}</Say>\n  <Gather input=\"speech\" action=\"https://YOUR_PUBLIC_N8N_URL/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">Thanks for calling. Goodbye.</Say>\n</Response>",
+        "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">{{ $json.output }}</Say>\n  <Gather input=\"speech\" action=\"https://patrick-n8n.onrender.com/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">Thanks for calling. Goodbye.</Say>\n</Response>",
         "options": {
           "responseHeaders": {
             "entries": [
@@ -47,7 +111,7 @@
         "promptType": "define",
         "text": "={{ $json.body.SpeechResult }}",
         "options": {
-          "systemMessage": "=When a caller wants to book, first collect their name, the service, and a specific date and time.\nBefore booking, repeat the name, service, date and time back to the caller and get an explicit \"yes\".\nOnly call book_appointment after they confirm.\nIf book_appointment reports that all stylists are booked, apologize and ask the caller for a different time.\nAfter a successful booking, read the confirmation back to the caller.\n\nIf the caller asks to speak to a human, a person, an agent, a receptionist, the front desk, or a manager — or is clearly upset and wants a real person — your ENTIRE reply must be exactly <<TRANSFER>> and nothing else. Do not add any other words."
+          "systemMessage": "=When a caller wants to book, first collect their name, the service, and a specific date and time.\nBefore booking, repeat the name, service, date and time back to the caller and get an explicit \"yes\".\nOnly call book_appointment after they confirm.\nIf book_appointment reports that all stylists are booked, apologize and ask the caller for a different time.\nAfter a successful booking, read the confirmation back to the caller.\n\nIf the caller asks to speak to a human, a person, an agent, a receptionist, the front desk, or a manager - or is clearly upset and wants a real person - your ENTIRE reply must be exactly <<TRANSFER>> and nothing else. Do not add any other words."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -73,7 +137,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        80,
+        192,
         208
       ],
       "id": "cff3c2f3-7898-4d9b-b9c6-306a840c2e4b",
@@ -94,7 +158,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        224,
+        288,
         208
       ],
       "id": "926a5a85-053f-4017-b401-321c61f2c4fb",
@@ -104,7 +168,7 @@
       "parameters": {
         "toolDescription": "Books the confirmed appointment. Call only after the caller says yes.",
         "method": "POST",
-        "url": "https://YOUR_N8N_HOST/webhook/vfd-book",
+        "url": "https://patrick-n8n.onrender.com/webhook/vfd-book",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ name: $fromAI('name', 'the caller full name'), service: $fromAI('service', 'service requested, e.g. haircut'), startTime: $fromAI('startTime', 'ISO 8601 datetime with Manila +08:00 offset'), phone: $('Webhook').item.json.body.From }) }}",
@@ -113,7 +177,7 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        368,
+        384,
         208
       ],
       "id": "9b00b461-8797-4893-9171-20ffa066a830",
@@ -166,70 +230,6 @@
       ],
       "id": "21c58c40-54e8-448c-bddb-c6afa730c115",
       "name": "Respond Transfer"
-    },
-    {
-      "parameters": {
-        "content": "## 🎙️ VFD - AI Voice Agent (the brain)\nDrives the phone conversation: caller speech -> AI agent (books, answers FAQs, qualifies, routes) with memory -> books via an HTTP tool -> returns TwiML. Core of the AI voice front desk.\n**OpenAI agent - Twilio TwiML - webhook**",
-        "height": 543,
-        "width": 228,
-        "color": 7
-      },
-      "id": "35a17172-8b44-4efb-bc67-0766cc3172b7",
-      "name": "Sticky · Call turn in",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -64,
-        -176
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## AI voice agent (the brain)\nGPT-4o-mini + memory. Qualifies and books mid-call via the booking tool.",
-        "height": 543,
-        "width": 296,
-        "color": 3
-      },
-      "id": "a7576ed8-782f-462f-bda6-a2c3339cd39f",
-      "name": "Sticky · AI voice agent (the brain)",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        176,
-        -176
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Transfer?\nDetects a request for a human.",
-        "height": 543,
-        "width": 378,
-        "color": 6
-      },
-      "id": "ab18df16-bcdc-46ed-a22a-cd0055d868c2",
-      "name": "Sticky · Transfer?",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        464,
-        -176
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Respond\nSpeaks the reply, or hands off to a live person.",
-        "height": 543,
-        "width": 309,
-        "color": 7
-      },
-      "id": "3de68d74-f6f3-41b5-aa0b-0a2a1e0d9dbc",
-      "name": "Sticky · Respond",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        848,
-        -176
-      ]
     }
   ],
   "connections": {
@@ -310,6 +310,325 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": {
+    "updatedAt": "2026-07-24T07:55:14.010Z",
+    "createdAt": "2026-07-24T07:55:14.010Z",
+    "versionId": "e01adc9d-1ed3-4c27-a013-483e1460e3e1",
+    "workflowId": "k7fVILPfOfZymW2M",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## 🎙️ VFD - AI Voice Agent (the brain)\nDrives the phone conversation: caller speech -> AI agent (books, answers FAQs, qualifies, routes) with memory -> books via an HTTP tool -> returns TwiML. Core of the AI voice front desk.\n**OpenAI agent - Twilio TwiML - webhook**",
+          "height": 543,
+          "width": 228,
+          "color": 7
+        },
+        "id": "35a17172-8b44-4efb-bc67-0766cc3172b7",
+        "name": "Sticky � Call turn in",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -64,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## AI voice agent (the brain)\nGPT-4o-mini + memory. Qualifies and books mid-call via the booking tool.",
+          "height": 543,
+          "width": 296,
+          "color": 3
+        },
+        "id": "a7576ed8-782f-462f-bda6-a2c3339cd39f",
+        "name": "Sticky � AI voice agent (the brain)",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          176,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Transfer?\nDetects a request for a human.",
+          "height": 543,
+          "width": 378,
+          "color": 6
+        },
+        "id": "ab18df16-bcdc-46ed-a22a-cd0055d868c2",
+        "name": "Sticky � Transfer?",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          464,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Respond\nSpeaks the reply, or hands off to a live person.",
+          "height": 543,
+          "width": 309,
+          "color": 7
+        },
+        "id": "3de68d74-f6f3-41b5-aa0b-0a2a1e0d9dbc",
+        "name": "Sticky � Respond",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          848,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "voice-respond",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "04d8688f-8cf6-423d-b170-d489cc20cc99",
+        "name": "Webhook",
+        "webhookId": "665a86a5-2f07-4374-9e68-160c43e357f8"
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">{{ $json.output }}</Say>\n  <Gather input=\"speech\" action=\"https://patrick-n8n.onrender.com/webhook/voice-respond\" method=\"POST\" speechTimeout=\"auto\"/>\n  <Say voice=\"Polly.Joanna\">Thanks for calling. Goodbye.</Say>\n</Response>",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "text/xml"
+                }
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          976,
+          160
+        ],
+        "id": "3f211095-ce55-4c82-a6c4-86c03345b535",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.body.SpeechResult }}",
+          "options": {
+            "systemMessage": "=When a caller wants to book, first collect their name, the service, and a specific date and time.\nBefore booking, repeat the name, service, date and time back to the caller and get an explicit \"yes\".\nOnly call book_appointment after they confirm.\nIf book_appointment reports that all stylists are booked, apologize and ask the caller for a different time.\nAfter a successful booking, read the confirmation back to the caller.\n\nIf the caller asks to speak to a human, a person, an agent, a receptionist, the front desk, or a manager - or is clearly upset and wants a real person - your ENTIRE reply must be exactly <<TRANSFER>> and nothing else. Do not add any other words."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          208,
+          0
+        ],
+        "id": "236eb9d6-45f2-4415-aeff-0bca3d1be298",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          192,
+          208
+        ],
+        "id": "cff3c2f3-7898-4d9b-b9c6-306a840c2e4b",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "SYpGRkU0nCCv3rd3",
+            "name": "OpenAI account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $json.body.CallSid }}",
+          "contextWindowLength": "={{ 10 }}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.4,
+        "position": [
+          288,
+          208
+        ],
+        "id": "926a5a85-053f-4017-b401-321c61f2c4fb",
+        "name": "Simple Memory"
+      },
+      {
+        "parameters": {
+          "toolDescription": "Books the confirmed appointment. Call only after the caller says yes.",
+          "method": "POST",
+          "url": "https://patrick-n8n.onrender.com/webhook/vfd-book",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ name: $fromAI('name', 'the caller full name'), service: $fromAI('service', 'service requested, e.g. haircut'), startTime: $fromAI('startTime', 'ISO 8601 datetime with Manila +08:00 offset'), phone: $('Webhook').item.json.body.From }) }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.4,
+        "position": [
+          384,
+          208
+        ],
+        "id": "9b00b461-8797-4893-9171-20ffa066a830",
+        "name": "book_appointment"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "1983c626-3895-44ba-9b8e-7afa787665ec",
+                "leftValue": "={{ $json.output }}",
+                "rightValue": "<<TRANSFER>>",
+                "operator": {
+                  "type": "string",
+                  "operation": "contains"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          592,
+          0
+        ],
+        "id": "ce212ae7-4c09-45e8-b3fc-679f66eaf31c",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>\n  <Say voice=\"Polly.Joanna\">Sure, connecting you to a team member now. Please hold.</Say>\n  <Dial>YOUR_PHONE_NUMBER</Dial>\n</Response>",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          976,
+          -80
+        ],
+        "id": "21c58c40-54e8-448c-bddb-c6afa730c115",
+        "name": "Respond Transfer"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "book_appointment": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Respond Transfer",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Patrick Sales",
+    "name": null,
+    "description": null,
+    "autosaved": false
   }
 }

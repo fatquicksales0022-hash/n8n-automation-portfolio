@@ -3,6 +3,70 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## New email",
+        "height": 863,
+        "width": 390,
+        "color": 5
+      },
+      "id": "0480e09a-36d9-4c1a-aefb-6845457fc44d",
+      "name": "Sticky · New email",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -383
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Qualify the lead\nIs it a lead? Temperature, contact, intent, quality.",
+        "height": 863,
+        "width": 480,
+        "color": 3
+      },
+      "id": "395e81e1-bbba-4044-a030-8ebf099d567c",
+      "name": "Sticky · Qualify the lead",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        330,
+        -383
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Route by temperature",
+        "height": 863,
+        "width": 648,
+        "color": 6
+      },
+      "id": "33b18ac0-cadb-45c6-a849-661c017669ac",
+      "name": "Sticky · Route by temperature",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        810,
+        -383
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Capture + reply\nUpsert into HubSpot, label, auto-reply to hot/warm, alert Slack.",
+        "height": 863,
+        "width": 1069,
+        "color": 7
+      },
+      "id": "a1b999f5-f52d-43b5-ad6f-068566bd57f6",
+      "name": "Sticky · Capture + reply",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1458,
+        -383
+      ]
+    },
+    {
+      "parameters": {
         "pollTimes": {
           "item": [
             {
@@ -23,7 +87,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -46,7 +110,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -91,7 +155,7 @@
             {
               "name": "confidence",
               "type": "number",
-              "description": "0–100 confidence in the is_lead decision"
+              "description": "0-100 confidence in the is_lead decision"
             },
             {
               "name": "reason",
@@ -128,12 +192,12 @@
             {
               "name": "data_quality_score",
               "type": "number",
-              "description": "0–100 completeness of the lead info."
+              "description": "0-100 completeness of the lead info."
             }
           ]
         },
         "options": {
-          "systemPromptTemplate": "=You are a senior SDR triaging an inbound email inbox. For each email you must\n(a) decide if it is a POSSIBLE SALES LEAD, and (b) if so, extract the lead's details.\n\nis_lead = true when a real person shows genuine interest in a business's product or\nservice — in ANY form: complete details, partial details, or just an inquiry\n(\"Do you offer X?\", \"How much?\", \"Can I get a demo/quote?\"). Treat missing info as a\ndata-quality issue, NEVER a reason to reject. When genuinely ambiguous, choose true.\n\nis_lead = false ONLY for clearly non-sales mail: newsletters, marketing blasts,\npromotions, receipts/invoices, shipping/order notices, password resets, security\nalerts, calendar invites, social notifications, out-of-office replies, spam, and\ninternal or personal messages.\n\nIMPORTANT: If the email is our OWN outbound acknowledgment — it thanks the recipient\nfor reaching out, says a team member will follow up, and is signed \"The Team\" — set\nis_lead = false. Never treat our own sent replies as leads.\n\nIf is_lead is false, set lead_temperature to \"none\" and leave contact fields \"\".\n\nWhen is_lead is true:\n- Pull name, company, email, phone from the body/signature; use \"\" for anything missing.\n  The lead's real email is usually in the body, not the envelope sender.\n- lead_temperature: hot = explicit buying signal (demo/quote/pricing/urgent);\n  warm = interested/exploring/asking; cold = vague or info-gathering only.\n- intent: one short phrase for what they want.\n- summary: one sentence describing the lead.\n- data_quality_score: score the ORIGINAL email's completeness. Start at 0 and add:\n  +25 full name, +25 identifiable company, +20 business (non-personal) email,\n  +15 phone number, +15 job title/role. Cap at 100. (Fully-detailed lead ≈ 100;\n  a name + email with nothing else ≈ 45.)\n- confidence: 0-100 for how sure you are about is_lead.\n- reason: one sentence justifying the is_lead decision.\nNever invent facts. Infer company from the email domain only if it is a business domain."
+          "systemPromptTemplate": "=You are a senior SDR triaging an inbound email inbox. For each email you must\n(a) decide if it is a POSSIBLE SALES LEAD, and (b) if so, extract the lead's details.\n\nis_lead = true when a real person shows genuine interest in a business's product or\nservice - in ANY form: complete details, partial details, or just an inquiry\n(\"Do you offer X?\", \"How much?\", \"Can I get a demo/quote?\"). Treat missing info as a\ndata-quality issue, NEVER a reason to reject. When genuinely ambiguous, choose true.\n\nis_lead = false ONLY for clearly non-sales mail: newsletters, marketing blasts,\npromotions, receipts/invoices, shipping/order notices, password resets, security\nalerts, calendar invites, social notifications, out-of-office replies, spam, and\ninternal or personal messages.\n\nIMPORTANT: If the email is our OWN outbound acknowledgment - it thanks the recipient\nfor reaching out, says a team member will follow up, and is signed \"The Team\" - set\nis_lead = false. Never treat our own sent replies as leads.\n\nIf is_lead is false, set lead_temperature to \"none\" and leave contact fields \"\".\n\nWhen is_lead is true:\n- Pull name, company, email, phone from the body/signature; use \"\" for anything missing.\n  The lead's real email is usually in the body, not the envelope sender.\n- lead_temperature: hot = explicit buying signal (demo/quote/pricing/urgent);\n  warm = interested/exploring/asking; cold = vague or info-gathering only.\n- intent: one short phrase for what they want.\n- summary: one sentence describing the lead.\n- data_quality_score: score the ORIGINAL email's completeness. Start at 0 and add:\n  +25 full name, +25 identifiable company, +20 business (non-personal) email,\n  +15 phone number, +15 job title/role. Cap at 100. (Fully-detailed lead ? 100;\n  a name + email with nothing else ? 45.)\n- confidence: 0-100 for how sure you are about is_lead.\n- reason: one sentence justifying the is_lead decision.\nNever invent facts. Infer company from the email domain only if it is a business domain."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
@@ -209,7 +273,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -221,7 +285,7 @@
           "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "id"
         },
-        "text": "=🆕 New {{ $('Lead Qualifier').item.json.output.lead_temperature }} lead\n👤 {{ $('Lead Qualifier').item.json.output.contact_name }} — {{ $('Lead Qualifier').item.json.output.company_name }}\n📧 {{ $('Lead Qualifier').item.json.output.contact_email }}\n💬 {{ $('Lead Qualifier').item.json.output.intent }}\n📊 Data quality: {{ $('Lead Qualifier').item.json.output.data_quality_score }}/100\n{{ ['hot','warm'].includes($('Lead Qualifier').item.json.output.lead_temperature) ? '✅ Auto-reply sent — please review the thread' : '❄️ No auto-reply (cold lead)' }}",
+        "text": "=?? New {{ $('Lead Qualifier').item.json.output.lead_temperature }} lead\n?? {{ $('Lead Qualifier').item.json.output.contact_name }} - {{ $('Lead Qualifier').item.json.output.company_name }}\n?? {{ $('Lead Qualifier').item.json.output.contact_email }}\n?? {{ $('Lead Qualifier').item.json.output.intent }}\n?? Data quality: {{ $('Lead Qualifier').item.json.output.data_quality_score }}/100\n{{ ['hot','warm'].includes($('Lead Qualifier').item.json.output.lead_temperature) ? '? Auto-reply sent - please review the thread' : '?? No auto-reply (cold lead)' }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -345,7 +409,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -369,14 +433,14 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=You are a friendly, professional sales assistant writing a SHORT acknowledgment\nreply to an inbound lead. Output ONLY the email body — no subject line, no\nplaceholders like [Name].\n\nRules:\n- Warmly thank them by first name for reaching out.\n- Acknowledge what they asked about in one line.\n- Say a team member will follow up shortly to help / set up a quick call.\n- Do NOT quote prices, make commitments, promise features, or invent any details.\n- Keep it under 90 words. Warm, human, concise.\n- Sign off as \"The Team\".\n\nLead:\nName: {{ $('Lead Qualifier').item.json.output.contact_name }}\nCompany: {{ $('Lead Qualifier').item.json.output.company_name }}\nThey asked about: {{ $('Lead Qualifier').item.json.output.intent }}",
+        "text": "=You are a friendly, professional sales assistant writing a SHORT acknowledgment\nreply to an inbound lead. Output ONLY the email body - no subject line, no\nplaceholders like [Name].\n\nRules:\n- Warmly thank them by first name for reaching out.\n- Acknowledge what they asked about in one line.\n- Say a team member will follow up shortly to help / set up a quick call.\n- Do NOT quote prices, make commitments, promise features, or invent any details.\n- Keep it under 90 words. Warm, human, concise.\n- Sign off as \"The Team\".\n\nLead:\nName: {{ $('Lead Qualifier').item.json.output.contact_name }}\nCompany: {{ $('Lead Qualifier').item.json.output.company_name }}\nThey asked about: {{ $('Lead Qualifier').item.json.output.intent }}",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -434,7 +498,7 @@
       "credentials": {
         "gmailOAuth2": {
           "id": "dku6asR2rjX2ypmP",
-          "name": "Gmail account"
+          "name": "Gmail account Local"
         }
       }
     },
@@ -446,7 +510,7 @@
           "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "id"
         },
-        "text": "=🆕 New {{ $('Lead Qualifier').item.json.output.lead_temperature }} lead\n👤 {{ $('Lead Qualifier').item.json.output.contact_name }} — {{ $('Lead Qualifier').item.json.output.company_name }}\n📧 {{ $('Lead Qualifier').item.json.output.contact_email }}\n💬 {{ $('Lead Qualifier').item.json.output.intent }}\n📊 Data quality: {{ $('Lead Qualifier').item.json.output.data_quality_score }}/100\n{{ ['hot','warm'].includes($('Lead Qualifier').item.json.output.lead_temperature) ? '✅ Auto-reply sent — please review the thread' : '❄️ No auto-reply (cold lead)' }}",
+        "text": "=?? New {{ $('Lead Qualifier').item.json.output.lead_temperature }} lead\n?? {{ $('Lead Qualifier').item.json.output.contact_name }} - {{ $('Lead Qualifier').item.json.output.company_name }}\n?? {{ $('Lead Qualifier').item.json.output.contact_email }}\n?? {{ $('Lead Qualifier').item.json.output.intent }}\n?? Data quality: {{ $('Lead Qualifier').item.json.output.data_quality_score }}/100\n{{ ['hot','warm'].includes($('Lead Qualifier').item.json.output.lead_temperature) ? '? Auto-reply sent - please review the thread' : '?? No auto-reply (cold lead)' }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
@@ -490,70 +554,6 @@
           "name": "HubSpot Header Auth Local"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "## 📨 Build 8 - Inbound Lead Capture\nNew inbound email -> AI extracts the lead, dedupes, creates/updates the HubSpot contact, routes by intent with a Slack alert + AI-drafted reply.\n**OpenAI - Gmail - HubSpot API - Slack**",
-        "height": 863,
-        "width": 390,
-        "color": 7
-      },
-      "id": "e287271d-ae8b-49d1-a79d-f15d0eeb3e7c",
-      "name": "Sticky · New email",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -60,
-        -383
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Qualify the lead\nIs it a lead? Temperature, contact, intent, quality.",
-        "height": 863,
-        "width": 480,
-        "color": 3
-      },
-      "id": "520771bb-7a8a-467d-8611-26987611bb33",
-      "name": "Sticky · Qualify the lead",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        330,
-        -383
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Route by temperature",
-        "height": 863,
-        "width": 648,
-        "color": 6
-      },
-      "id": "4280107f-8ae3-4c79-8ce4-1b86f1e8bff2",
-      "name": "Sticky · Route by temperature",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        810,
-        -383
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## Capture + reply\nUpsert into HubSpot, label, auto-reply to hot/warm, alert Slack.",
-        "height": 863,
-        "width": 1069,
-        "color": 7
-      },
-      "id": "44468652-a297-404d-9935-71a1fc78302c",
-      "name": "Sticky · Capture + reply",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1458,
-        -383
-      ]
     }
   ],
   "connections": {
@@ -718,6 +718,8 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
-  }
+    "availableInMCP": false,
+    "errorWorkflow": "SbflflX8AhUWCv6d"
+  },
+  "activeVersion": null
 }
