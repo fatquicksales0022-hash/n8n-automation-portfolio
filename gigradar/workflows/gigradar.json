@@ -1,0 +1,958 @@
+{
+  "name": "GigRadar",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://www.onlinejobs.ph/jobseekers/jobsearch?jobkeyword=n8n&skill_tags=&gig=on&partTime=on&fullTime=on&isFromJobsearchForm=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9de683e7-4fdf-4435-8ed4-78bf199b1ec0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "html",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "url",
+              "cssSelector": "a",
+              "returnValue": "attribute",
+              "attribute": "href"
+            },
+            {
+              "key": "title",
+              "cssSelector": "h4.fs-16"
+            },
+            {
+              "key": "type",
+              "cssSelector": "h4 .badge"
+            },
+            {
+              "key": "posted_at",
+              "cssSelector": "p.fs-13",
+              "returnValue": "attribute",
+              "attribute": "data-temp"
+            },
+            {
+              "key": "pay",
+              "cssSelector": "dd.col"
+            },
+            {
+              "key": "description",
+              "cssSelector": "div.desc"
+            },
+            {
+              "key": "skills",
+              "cssSelector": "div.job-tag a.badge",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "bfa757b1-8140-441e-a878-3992d4ea86de",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/harvestapi~linkedin-job-search/run-sync-get-dataset-items?token=YOUR_APIFY_TOKEN",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"jobTitles\": [\"n8n\", \"GoHighLevel\", \"AI automation\", \"Make.com\"], \"maxItems\": 10, \"sortBy\": \"date\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        208
+      ],
+      "id": "5396abad-6fb5-4ba3-828b-d09803bc5ce5",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/chronometrica~upwork-job-scraper/run-sync-get-dataset-items?token=YOUR_APIFY_TOKEN",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"maxItems\": 5,\n    \"postedWithin\": \"7d\",\n    \"saveOnlyUniqueItems\": true,\n    \"searchTerm\": \"AI automation\",\n    \"sortBy\": \"recency\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        400
+      ],
+      "id": "7cb261c8-3ac7-48e9-914c-9845a6acc795",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// OnlineJobs.ph → canonical\nlet title = ($json.title || '').replace(/\\s+/g, ' ').trim();\nconst type = ($json.type || '').trim();\nif (type && title.endsWith(type)) {\n  title = title.slice(0, -type.length).trim();\n}\n\nlet url = ($json.url || '').replace(/\\\\/g, '/').trim();\nif (url.startsWith('/')) url = 'https://www.onlinejobs.ph' + url;\n\nconst description = ($json.description || '')\n  .replace(/\\[\\/jobseekers\\/[^\\]]*\\]/g, '')   // strip bracketed job-links\n  .replace(/See\\s*More/gi, '')                // strip \"See More\"\n  .trim();\n\nconst skills = (Array.isArray($json.skills) ? $json.skills : ($json.skills ? [$json.skills] : []))\n  .map(s => (s || '').trim())\n  .filter(Boolean);                           // drop empty strings\n\nreturn {\n  json: {\n    source: 'onlinejobs',\n    title,\n    url,\n    company: null,\n    pay: ($json.pay || '').trim() || null,\n    type: type || null,\n    posted_at: $json.posted_at || null,\n    description,\n    skills,\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "f2de92eb-0c65-4861-bcdf-91f82acf2f6e",
+      "name": "Normalize ① (OLJ)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// LinkedIn (Apify) → canonical\nreturn {\n  json: {\n    source: 'linkedin',\n    title: ($json.title || '').trim(),\n    url: $json.linkedinUrl || null,\n    company: $json.company?.name || null,\n    pay: $json.salary?.text || null,\n    type: ($json.employmentType || '').replace(/_/g, ' ').trim() || null,\n    posted_at: $json.postedDate || null,\n    description: ($json.descriptionText || '').trim(),\n    skills: [],   // LinkedIn has no per-job skills; scorer reads description\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        208
+      ],
+      "id": "50629208-5f69-451c-a4d4-cfd1414a342d",
+      "name": "Normalize ② (LinkedIn)"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Upwork (Apify) → canonical\nlet pay = null;\nif ($json.hourly_min_amount) {\n  const cur = $json.hourly_currency || 'USD';\n  pay = $json.hourly_max_amount\n    ? `${cur} ${$json.hourly_min_amount}–${$json.hourly_max_amount}/hr`\n    : `${cur} ${$json.hourly_min_amount}/hr`;\n} else if ($json.budget_amount) {\n  pay = `${$json.budget_currency || 'USD'} ${$json.budget_amount} fixed`;\n}\n\nreturn {\n  json: {\n    source: 'upwork',\n    title: ($json.title || '').trim(),\n    url: $json.url || null,\n    company: null,          // Upwork clients are anonymous\n    pay,\n    type: $json.engagement_type || null,\n    posted_at: $json.published_at || null,\n    description: ($json.description || '').trim(),\n    skills: Array.isArray($json.skills) ? $json.skills : [],\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        400
+      ],
+      "id": "2d853718-9c4e-47fd-956b-50dfdd20b903",
+      "name": "Normalize ③ (Upwork)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data;\nconst chunks = html.split('<!-- Start -->').slice(1);\n\nreturn chunks.map(chunk => ({ json: { html: chunk } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "44b34e9d-78e5-4549-b6be-9f426deb81c3",
+      "name": "[Code: Split]"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1088,
+        192
+      ],
+      "id": "8547418f-88b5-4a3f-a267-16c2464fde27",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "GigRadar Ledger",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "source": "={{ $json.source }}",
+            "title": "={{ $json.title }}",
+            "url": "={{ $json.url }}",
+            "seen_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "seen_at",
+              "displayName": "seen_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1808,
+        560
+      ],
+      "id": "a2c40257-4d77-40b8-b514-7c7e84f960dd",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yMqkk4M0kF50KIC0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// stable id from source+url, no external/builtin modules (n8n-sandbox safe)\nfunction hashId(str) {\n  let h1 = 0xdeadbeef ^ 0, h2 = 0x41c6ce57 ^ 0;\n  for (let i = 0; i < str.length; i++) {\n    const ch = str.charCodeAt(i);\n    h1 = Math.imul(h1 ^ ch, 2654435761);\n    h2 = Math.imul(h2 ^ ch, 1597334677);\n  }\n  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);\n  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);\n  return (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');\n}\n\nreturn items.map(item => {\n  const j = item.json;\n  j.id = hashId(`${j.source}|${j.url}`);\n  return { json: j };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        208
+      ],
+      "id": "b133b717-7bfc-4f5f-8225-88674d4c2d11",
+      "name": "Add id"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        208
+      ],
+      "id": "26d65896-4ccf-435c-a39c-30ae535faf90",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You score how well a job matches Patrick Sales, an AI Automation Specialist.\nReturn ONLY JSON: {\"score\": <0-100>, \"reasons\": [..], \"red_flags\": [..], \"matched_skills\": [..]}\n\nPatrick's STRONG, proven skills (weight these HIGH):\nGoHighLevel (GHL), n8n, Make.com, Zapier, Airtable, voice AI (Vapi/Twilio),\nAI agents & workflow automation, OpenAI/gpt LLM builds, HubSpot (via API),\nlead-gen / CRM / speed-to-lead, webhooks & API integration, Google Sheets, Slack.\n\nPatrick's HARD GAPS (list any that the job REQUIRES in red_flags):\nClosebot, AWS/cloud infra, Django or heavy backend frameworks, production LangChain,\ndeep production Python, front-end/full-stack dev roles, rigid US-timezone-only hours.\n\nScoring guide:\n- 85-100: core stack match (GHL/n8n/Make/voice AI/automation), no hard gaps.\n- 70-84: strong automation fit, maybe one minor gap.\n- 40-69: partial fit or a required hard gap present.\n- 0-39: off-target (pure dev, unrelated field, or multiple hard gaps).\nmatched_skills = which of Patrick's strong skills the job actually asks for.\nreasons = 2-4 short bullets. Be strict and honest."
+            },
+            {
+              "content": "=Title: {{ $json.title }}\nType: {{ $json.type }}\nPay: {{ $json.pay }}\nSkills: {{ $json.skills }}\nDescription: {{ $json.description }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "store": true,
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1824,
+        208
+      ],
+      "id": "31ba6036-6e3a-4341-b322-41315a2dc255",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SYpGRkU0nCCv3rd3",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// M4b — parse AI JSON + merge back onto the original job\nconst jobs = $('Remove Duplicates').all();      // ⚠️ dev: input to AI node is \"Remove Duplicates\"\nconst ai = $input.all();             // the 37 AI responses (same order)\n\nfunction parseScore(node) {\n  let raw =\n    node.json?.output?.[0]?.content?.[0]?.text ??\n    node.json?.content?.[0]?.text ??\n    node.json?.message?.content ??\n    node.json?.text ??\n    node.json;\n  if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (e) { raw = {}; } }\n  return raw || {};\n}\n\nreturn jobs.map((job, i) => {\n  const s = parseScore(ai[i]);\n  return { json: {\n    ...job.json,\n    score:          Number(s.score) || 0,\n    reasons:        Array.isArray(s.reasons) ? s.reasons : [],\n    red_flags:      Array.isArray(s.red_flags) ? s.red_flags : [],\n    matched_skills: Array.isArray(s.matched_skills) ? s.matched_skills : [],\n  }};\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2176,
+        208
+      ],
+      "id": "6986b0c7-904d-4c77-a247-bf3999b52e79",
+      "name": "Attach score"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "GigRadar Ledger",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1667233126,
+          "mode": "list",
+          "cachedResultName": "scored",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit#gid=1667233126"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "source": "={{ $json.source }}",
+            "title": "={{ $json.title }}",
+            "url": "={{ $json.url }}",
+            "score": "={{ $json.score }}",
+            "matched_skills": "={{ $json.matched_skills.join(', ') }}",
+            "red_flags": "={{ $json.red_flags.join(' | ') }}",
+            "reasons": "={{ $json.reasons.join(' | ') }}",
+            "scored_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "matched_skills",
+              "displayName": "matched_skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "red_flags",
+              "displayName": "red_flags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reasons",
+              "displayName": "reasons",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scored_at",
+              "displayName": "scored_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2608,
+        224
+      ],
+      "id": "97d56164-352c-4d69-bf76-ae11d4335e65",
+      "name": "Log score",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "yMqkk4M0kF50KIC0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ca69fd83-55ae-4307-b443-9a8bdd0d941a",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2592,
+        48
+      ],
+      "id": "50ffec5a-9ca4-4cb0-9950-59501349a62c",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        -16
+      ],
+      "id": "f54d0faf-8e4c-404b-93f1-61a44dfa73f2",
+      "name": "Winners"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You write SHORT, specific job proposals for Patrick Sales, an AI Automation Specialist.\n\nSTYLE (strict):\n- 90–140 words. No greeting fluff. The first two lines must carry it — open with THEIR\n  problem or a concrete detail from the job post, never \"I hope you're well\" / \"I'm excited\".\n- One idea per line. Plain, human, first-person. No buzzword stacking.\n- End with one low-friction call to action.\n\nWHAT PATRICK CAN HONESTLY CLAIM (reference only SHIPPED work):\n- GoHighLevel AI front desk / speed-to-lead / lead capture (FrontDesk Pro, SpeedLead)\n- n8n automation on self-hosted Render; OpenAI gpt-4o-mini agents & workflows\n- Voice AI receptionist (Vapi + Twilio), inbound + outbound, live-call proven\n- Make.com + Zapier + Airtable lead responders\n- Xero AR autopilot (CashChaser); WhatsApp→task router (TaskRelay)\n- HubSpot AI (Breeze) + CRM v3 API; Next.js + Vercel + Supabase front-end (FrontStage)\n\nHONESTY RULE (non-negotiable):\n- Never claim a tool or result Patrick hasn't shipped. If the job needs something he lacks\n  (Closebot, AWS, Django, deep production Python), do NOT fake it — omit it, or name it\n  honestly as something he'd ramp on. Map only his REAL matched skills to their needs.\n\nReturn ONLY the proposal text.\n\nADDRESS the client directly as \"you\" / \"your\". Never write \"their\", \"the client\", or third-person.\n\nLINE 1 must name a SPECIFIC concrete detail from THIS post (a named tool, a task, a stated pain)\n— proof you actually read it. Never open by restating the job title.\n\nBANNED phrases (never use any): \"drive results\", \"boost efficiency\", \"seamless\",\n\"I would love to\", \"contribute to your team's goals\", \"leverage\", \"passionate\",\n\"I'm excited\", \"take your ___ to the next level\", \"in today's fast-paced\"."
+            },
+            {
+              "content": "=Job title: {{ $json.title }}\nTheir needs: {{ $json.description }}\nJob skills: {{ $json.skills }}\nPatrick's matched skills: {{ $json.matched_skills }}\nWhy it fits (score {{ $json.score }}): {{ $json.reasons }}\n\n\nThe job (write TO this client as \"you\"):\nTitle: {{ $json.title }}\nWhat they need: {{ $json.description }}\n..."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        3152,
+        -16
+      ],
+      "id": "e71fa999-1166-486f-9684-0906979eaf49",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "SYpGRkU0nCCv3rd3",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const jobs = $('Winners').all();\nconst ai = $input.all();\nfunction getText(n){\n  let t = n.json?.output?.[0]?.content?.[0]?.text ?? n.json?.content?.[0]?.text\n       ?? n.json?.text ?? n.json?.message?.content ?? '';\n  return typeof t === 'string' ? t : JSON.stringify(t);\n}\nreturn jobs.map((job, i) => ({ json: { ...job.json, proposal: getText(ai[i]) } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3488,
+        -16
+      ],
+      "id": "71208bea-c1f0-4b43-a84f-88534d012d3a",
+      "name": "Attach draft"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BMLAKBHEG",
+          "mode": "list",
+          "cachedResultName": "gigradar"
+        },
+        "text": "=*{{ $json.title }}*  ·  score {{ $json.score }} {{ $json.url }}  {{ $json.proposal }}  _Matched: {{ $json.matched_skills.join(', ') }}_",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        3680,
+        -16
+      ],
+      "id": "1755210e-f9aa-4ae2-bb9c-a49e8ba0c6f7",
+      "name": "Send a message",
+      "webhookId": "a9f9cc03-1a12-4363-afd7-5dae83715be2",
+      "credentials": {
+        "slackApi": {
+          "id": "1OmcAA2AKHVVunVC",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        208
+      ],
+      "id": "32877c50-8919-465e-afb6-e92514327b0e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## 📡 GigRadar - multi-source job feed → AI scorer → cover-letter drafter\nScrapes OnlineJobs.ph + LinkedIn + Upwork daily, dedupes, scores every job against my skill profile with gpt-4o-mini, then drafts an honest cover letter for the strong matches and posts it to Slack for review.\n**n8n · Apify · OpenAI gpt-4o-mini · Google Sheets · Slack**",
+        "height": 180,
+        "width": 780,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -460
+      ],
+      "id": "bcce4abb-09ff-4041-ab47-7348ae940659",
+      "name": "Header"
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Fetch + normalize (3 sources)\nSchedule fans out to: OnlineJobs.ph self-scrape (HTTP → split on `<!-- Start -->` comments → HTML Extract) + LinkedIn & Upwork via Apify `run-sync-get-dataset-items`. Each Normalize node emits ONE canonical record `{id,source,title,url,company,pay,type,posted_at,description,skills[]}` so nothing downstream reads a source-specific field.",
+        "height": 190,
+        "width": 1000,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -150,
+        -240
+      ],
+      "id": "18e12d0e-c24a-4b9a-a385-caf5b41e61ba",
+      "name": "Stage 1"
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Merge + dedupe ledger\nMerge all 3 sources → Add id (cyrb53 hash of `source|url`; n8n sandboxes `require('crypto')`) → Remove Duplicates ('items processed in previous executions', key = id) so already-seen jobs never re-hit the paid AI call. Google Sheet `seen` tab is the auditable ledger.",
+        "height": 190,
+        "width": 765,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        -240
+      ],
+      "id": "aae218e8-6fd5-49d1-9977-19c3ab8d8b6f",
+      "name": "Stage 2"
+    },
+    {
+      "parameters": {
+        "content": "### 3 · AI scoring (gpt-4o-mini, temperature 0)\nScores each NEW job 0-100 vs my profile → `{score, reasons, red_flags, matched_skills}`. 'Attach score' re-joins the model output to the job by index (the OpenAI node drops input fields). 'Log score' writes EVERY score to the `scored` tab. IF ≥ 70 continues.",
+        "height": 190,
+        "width": 940,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        -240
+      ],
+      "id": "43e4aea2-30e5-4f1a-8048-6557ed7ecdad",
+      "name": "Stage 3"
+    },
+    {
+      "parameters": {
+        "content": "### 4 · Cover-letter drafter → Slack\n≥70 winners → gpt-4o-mini drafts a short, honest proposal (opens with the client's own detail; only claims SHIPPED builds; names real gaps) → posts to #gigradar for human review. NEVER auto-submits.",
+        "height": 190,
+        "width": 1020,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2790,
+        -240
+      ],
+      "id": "b0d36c36-e875-4e01-b347-37d5ac01cbc0",
+      "name": "Stage 4"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "[Code: Split]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Normalize ② (LinkedIn)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Normalize ③ (Upwork)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize ① (OLJ)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Normalize ① (OLJ)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[Code: Split]": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize ② (LinkedIn)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Normalize ③ (Upwork)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Add id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add id": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Attach score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach score": {
+      "main": [
+        [
+          {
+            "node": "Log score",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Winners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Winners": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Attach draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach draft": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "P0E9AurebKztiWxo",
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}
