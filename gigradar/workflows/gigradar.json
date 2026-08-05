@@ -604,12 +604,14 @@
         "select": "channel",
         "channelId": {
           "__rl": true,
-          "value": "C0BMLAKBHEG",
+          "value": "YOUR_SLACK_CHANNEL_ID",
           "mode": "list",
           "cachedResultName": "gigradar"
         },
         "text": "=*{{ $json.title }}*  ·  score {{ $json.score }} {{ $json.url }}  {{ $json.proposal }}  _Matched: {{ $json.matched_skills.join(', ') }}_",
-        "otherOptions": {}
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
       },
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.5,
@@ -953,6 +955,7 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "P0E9AurebKztiWxo",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "Asia/Manila"
   }
 }
