@@ -1,0 +1,318 @@
+{
+  "name": "HireFlow — Weekly Brief",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "718ac584-f97d-46bb-88eb-3e79f8ec4cdf",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"gpt-4o-mini\",\n  messages: [\n    { role: \"system\", content: \"You are an HR operations analyst. Using ONLY the metrics provided, write a concise, friendly weekly hiring & onboarding brief for the company owner. Lead with a one-line summary, then a short dash list of the key numbers, then flag anything needing attention (stale candidates with no movement, outstanding onboarding documents). Plain text, under 180 words, warm but professional.\" },\n    { role: \"user\", content: `This week's HireFlow metrics (JSON): ${JSON.stringify($json)}` }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        976,
+        0
+      ],
+      "id": "871c7034-410f-460f-bce9-c9c95033df37",
+      "name": "HTTP Request",
+      "credentials": {
+        "openAiApi": {
+          "id": "SYpGRkU0nCCv3rd3",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "you@example.com",
+        "subject": "=HireFlow — Weekly HR Brief ({{ $now.toFormat('LLL d') }})",
+        "message": "={{ $('HTTP Request').first().json.choices[0].message.content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "a952558a-32cc-40d1-8a87-86dc0812f998",
+      "name": "Send a message",
+      "webhookId": "4b5b0df3-8911-4072-8606-c0e879c9796a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dku6asR2rjX2ypmP",
+          "name": "Gmail account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "HireFlow",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_ONBOARDING_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Onboarding",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ONBOARDING_TABLE_ID"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "2d75c4b2-9374-4208-b015-32636c8b3c87",
+      "name": "Search",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const onboarding = $input.all().map(r => r.json.fields);\nconst outstandingDocs = onboarding.filter(f => f['Doc Required'] === true && f.Status !== 'Done').length;\nconst cs = $('Search 1').first().json;\nreturn [{ json: { ...cs, onboardingOutstanding: outstandingDocs, onboardingTotal: onboarding.length } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "73a16c60-22ab-4de1-83b8-5ab2d0811053",
+      "name": "Combine"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "HireFlow",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "69b94784-e1a5-4036-baa2-5700f81352cb",
+      "name": "Search 1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = Date.now();\nconst WEEK = 7 * 24 * 60 * 60 * 1000;\nconst byRole = {}, byStage = {};\nlet shortlist = 0, stale = 0;\nfor (const it of items) {\n  const f = it.json.fields;\n  byRole[f.Role]   = (byRole[f.Role]   || 0) + 1;\n  byStage[f.Stage] = (byStage[f.Stage] || 0) + 1;\n  if (f.Recommendation === 'Shortlist') shortlist++;\n  const created = new Date(it.json.createdTime).getTime();\n  if ((now - created) > WEEK && ['New', 'Screened'].includes(f.Stage)) stale++;\n}\nreturn [{ json: {\n  total: items.length,\n  byRole, byStage,\n  shortlist,\n  shortlistRate: items.length ? Math.round(100 * shortlist / items.length) : 0,\n  stale\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "aaa32185-c1e0-46c4-98c8-1d64cb6a39be",
+      "name": "Candidates Stats"
+    },
+    {
+      "parameters": {
+        "content": "## 📊 HireFlow — Weekly HR Brief\nEach week, aggregates the Candidates and Onboarding tables — applications by role, shortlist rate, stale candidates, outstanding documents — and emails the owner an LLM-written summary.\n**n8n · Airtable · OpenAI · Gmail**",
+        "height": 170,
+        "width": 900,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -320
+      ],
+      "id": "10f1340c-cfa1-4aa5-a9f2-6f02b2fefa24",
+      "name": "Sticky 211734f2"
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Weekly schedule\nFires weekly to compile the hiring & onboarding brief for the owner.",
+        "height": 150,
+        "width": 200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -10,
+        -180
+      ],
+      "id": "f816a304-b82c-42dc-ae5b-3f0ba5ca3af7",
+      "name": "Sticky a570353c"
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Crunch candidates\nSearch pulls the whole Candidates pipeline; Candidate Stats (run once for ALL items) computes totals by role/stage, shortlist rate, and stale candidates (no movement >7 days).",
+        "height": 150,
+        "width": 390,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -180
+      ],
+      "id": "bc84704f-2fbb-482e-9440-4cfe9520d3cb",
+      "name": "Sticky ad6d5220"
+    },
+    {
+      "parameters": {
+        "content": "### 3 · Add onboarding + combine\nSearch pulls the Onboarding table; Combine collapses it to a single stats object (outstanding docs) and merges the candidate metrics. That single-item collapse is what stops the brief sending once per row.",
+        "height": 150,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        590,
+        -180
+      ],
+      "id": "8ecdc96c-cf41-437b-960c-b75ef7e1b623",
+      "name": "Sticky b95cc222"
+    },
+    {
+      "parameters": {
+        "content": "### 4 · Write & send\ngpt-4o-mini turns the metrics into a concise, friendly brief; Gmail sends it to the owner (an internal report, so send — not a draft).",
+        "height": 150,
+        "width": 420,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        974,
+        -180
+      ],
+      "id": "b22ba498-2259-4884-9bc1-850888a2a265",
+      "name": "Sticky 3dc984c1"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search": {
+      "main": [
+        [
+          {
+            "node": "Combine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search 1": {
+      "main": [
+        [
+          {
+            "node": "Candidates Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Candidates Stats": {
+      "main": [
+        [
+          {
+            "node": "Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

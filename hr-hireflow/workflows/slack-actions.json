@@ -1,0 +1,850 @@
+{
+  "name": "HireFlow — Slack Actions",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hireflow-slack-actions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7d8cda7d-c6da-4a0d-832b-79f0a4ad9b4b",
+      "name": "Webhook",
+      "webhookId": "714afdaf-f314-46b4-9ba8-ffe38b732240"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action_id }}",
+                    "rightValue": "approve",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b1774987-fd09-47e4-95e0-adafc21e84ef"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d2437afe-198e-42ad-9f12-0fc91759bf3c",
+                    "leftValue": "={{ $json.action_id }}",
+                    "rightValue": "decline",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "97b64381-8d3f-4529-801a-20f269ff7373",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Roles",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_ROLES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ROLES_TABLE_ID"
+        },
+        "filterByFormula": "={Role Title} = \"{{ $('Code').first().json.role }}\"",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "f5823644-bde9-4931-8b0f-f39d8c123f8a",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = JSON.parse($json.body.payload);\nconst action = p.actions[0];\nconst data = JSON.parse(action.value);   // {recordId, role, name, email} from the button\nreturn {\n  json: {\n    action_id: action.action_id,         // \"approve\" or \"decline\"\n    recordId: data.recordId,\n    role: data.role,\n    name: data.name,\n    email: data.email,\n    response_url: p.response_url,         // used later to update the card\n    clicked_by: p.user?.username\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fd9246d7-7dc0-4856-bbec-1aa3258fbae1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Interview invitation — {{ $('Code').first().json.role }}",
+        "message": "=Hi {{ $('Code').first().json.name }},\n\nThanks for applying for the {{ $('Code').first().json.role }} role — we'd love to move forward and set up an interview.\n\nPlease grab a time that works for you here:\n{{ $('Search records').first().json.fields['Booking Link'] }}\n\nLooking forward to speaking.\n\nBest,\nThe Hiring Team",
+        "options": {
+          "sendTo": "={{ $('Code').first().json.email }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "0f6de2fa-6b94-4ea0-9a29-aa5d4dd1df9b",
+      "name": "Create a draft",
+      "webhookId": "c71dc80f-121b-4923-accf-7f91bb7f4efa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dku6asR2rjX2ypmP",
+          "name": "Gmail account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Update on your application — {{ $('Code').first().json.role }}",
+        "message": "=Hi {{ $('Code').first().json.name }},  Thank you for taking the time to apply for the {{ $('Code').first().json.role }} role and for sharing your background with us.  After careful review, we've decided not to move forward at this time. It was a competitive process and the decision wasn't easy — please don't read it as a reflection of your ability.  We genuinely appreciate your interest and wish you the very best in your search.  Warm regards, The Hiring Team",
+        "options": {
+          "sendTo": "= {{ $('Code').first().json.email }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        96
+      ],
+      "id": "eec4caf0-de93-47db-8956-b73e0241f811",
+      "name": "Create a draft1",
+      "webhookId": "db7ce7ea-2e24-48f5-9c5d-eb97dcc54183",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dku6asR2rjX2ypmP",
+          "name": "Gmail account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Roles",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Code').first().json.recordId }}",
+            "Stage": "Interview"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Maybe",
+                  "value": "Maybe"
+                },
+                {
+                  "name": "Not a fit",
+                  "value": "Not a fit"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Screened",
+                  "value": "Screened"
+                },
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Interview",
+                  "value": "Interview"
+                },
+                {
+                  "name": "Offer",
+                  "value": "Offer"
+                },
+                {
+                  "name": "Hired",
+                  "value": "Hired"
+                },
+                {
+                  "name": "Not proceeding",
+                  "value": "Not proceeding"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reasoning",
+              "displayName": "Reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Must-have Misses",
+              "displayName": "Must-have Misses",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Red Flags",
+              "displayName": "Red Flags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Resume Text",
+              "displayName": "Resume Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "036e0ff4-710b-41f2-934b-93ffb441ab54",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Roles",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Code').first().json.recordId }}",
+            "Stage": "Not proceeding"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Maybe",
+                  "value": "Maybe"
+                },
+                {
+                  "name": "Not a fit",
+                  "value": "Not a fit"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Screened",
+                  "value": "Screened"
+                },
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Interview",
+                  "value": "Interview"
+                },
+                {
+                  "name": "Offer",
+                  "value": "Offer"
+                },
+                {
+                  "name": "Hired",
+                  "value": "Hired"
+                },
+                {
+                  "name": "Not proceeding",
+                  "value": "Not proceeding"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reasoning",
+              "displayName": "Reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Must-have Misses",
+              "displayName": "Must-have Misses",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Red Flags",
+              "displayName": "Red Flags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Resume Text",
+              "displayName": "Resume Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true,
+          "updateAllMatches": false
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        96
+      ],
+      "id": "796d77f4-29c8-4185-81d6-4d123da459e8",
+      "name": "Update record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Code').first().json.response_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  replace_original: true,\n  blocks: [\n    { type: \"section\", text: { type: \"mrkdwn\", text: `✅ *Approved* by ${$('Code').first().json.clicked_by} — interview draft created for *${$('Code').first().json.name}* (${$('Code').first().json.role}). Stage → Interview.` } }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1248,
+        -96
+      ],
+      "id": "d67983eb-30fb-4239-b72b-76fa79a82109",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Code').first().json.response_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  replace_original: true,\n  blocks: [\n    { type: \"section\", text: { type: \"mrkdwn\", text: `✕ *Declined* by ${$('Code').first().json.clicked_by} — rejection draft created for *${$('Code').first().json.name}* (${$('Code').first().json.role}). Stage → Not proceeding.` } }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "aacc3126-c487-418c-860b-ef9e660a935e",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "content": "## 🖱️ HireFlow — Slack Actions (Human-in-the-Loop)\nThe hiring manager clicks Approve / Decline on the Slack card → the right Gmail DRAFT is prepared, the ATS stage advances, and the card locks with an audit stamp of who decided.\n**Every candidate-facing email is a draft behind a human click — never auto-sent.**\n**n8n · Slack · Airtable · Gmail**",
+        "height": 190,
+        "width": 900,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -430
+      ],
+      "id": "38687fb0-e01d-48e6-b3ec-cfbe9646d33f",
+      "name": "Sticky 549de131"
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Button click in\nSlack posts the button click here (Interactivity webhook) — respond <3s. Code parses the form-encoded payload into the action + a self-describing candidate blob (recordId, role, name, email), so no lookup is needed.",
+        "height": 160,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -10,
+        -270
+      ],
+      "id": "025a8b3c-5c9b-4cc3-a411-3d75f8fc16d9",
+      "name": "Sticky ac9163a1"
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Route\nSwitch branches on action_id: approve (top) vs decline (bottom). There is deliberately NO auto-reject path — a human already clicked.",
+        "height": 160,
+        "width": 200,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        406,
+        -270
+      ],
+      "id": "1fd5145f-8f36-488f-8e8f-18c3ca7611e4",
+      "name": "Sticky ad6541f7"
+    },
+    {
+      "parameters": {
+        "content": "### 3 · Approve → invite DRAFT\nAirtable fetches the role's booking link → Gmail DRAFT interview invite carrying it → ATS Stage → Interview → the Slack card updates in place to '✅ Approved by …' (removes the buttons, blocks double-clicks).",
+        "height": 160,
+        "width": 760,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        614,
+        -270
+      ],
+      "id": "78988b13-3e8d-4168-b772-ee7737f77aa4",
+      "name": "Sticky 817a9c7d"
+    },
+    {
+      "parameters": {
+        "content": "### 4 · Decline → rejection DRAFT\nGmail DRAFT of a kind, generic rejection (no link) → ATS Stage → Not proceeding → the Slack card updates to '✕ Declined by …'.",
+        "height": 160,
+        "width": 640,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        614,
+        240
+      ],
+      "id": "dfba8a77-54bf-41c4-a8ba-cf2134e4de3a",
+      "name": "Sticky f5648887"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a draft1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft1": {
+      "main": [
+        [
+          {
+            "node": "Update record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

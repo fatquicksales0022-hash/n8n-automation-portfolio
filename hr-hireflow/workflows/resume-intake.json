@@ -1,0 +1,721 @@
+{
+  "name": "HireFlow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "620b7b39-3a20-4e1d-a4ad-b2f8c98465c5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "formTitle": "HireFlow — Resume Intake",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        16,
+        176
+      ],
+      "id": "44f7eeb2-f7f6-4b31-9acc-b56890620462",
+      "name": "HireFlow — Resume Intake",
+      "webhookId": "4824067e-7b8d-48b9-8cb5-6f06920d86be"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        176
+      ],
+      "id": "845ee3bb-a399-465c-88fc-8cbf52862c70",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.item.json;\nconst content = j.choices[0].message.content;\nconst o = JSON.parse(content);\nreturn { json: o.output ? o.output : o };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        176
+      ],
+      "id": "9b804ea6-eb92-48ed-acfd-704e32df7d15",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d915dfe-e701-4202-bde2-9ecf2423746c",
+              "name": "prompt",
+              "value": "==You are a hiring screening assistant. Score the candidate STRICTLY against the role scorecard below. Output ONLY json.\n\nROLE SCORECARD — {{ $json.fields['Role Title'] }}\nMust-haves (required, weight these most):\n{{ $json.fields['Must-haves'] }}\nNice-to-haves:\n{{ $json.fields['Nice-to-haves'] }}\n\nScoring rules:\n- score: integer 0-100 reflecting fit to must-haves first, then nice-to-haves.\n- recommendation: \"Shortlist\" if score >= 75, \"Maybe\" if 50-74, \"Not a fit\" if < 50.\n\nFAIRNESS RULES (must follow):\n- Judge ONLY job-relevant evidence.\n- IGNORE and NEVER mention: candidate name, age, photo, gender, nationality, address, graduation dates, or the prestige of any school.\n- Every point must cite actual evidence from the resume text.\n\nThe resume text may be messy — flattened columns, tables collapsed into lines, missing spaces. Read through the formatting noise.\n\nReturn json EXACTLY in this shape:\n{\"output\":{\"score\":0,\"recommendation\":\"\",\"must_have_hits\":[],\"must_have_misses\":[],\"nice_to_have_hits\":[],\"red_flags\":[],\"summary\":\"\",\"reasoning\":\"\"}}\n\nRESUME TEXT:\n{{ $('Extract from File').first().json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        176
+      ],
+      "id": "df8415df-3e20-4150-833f-7a8546070eeb",
+      "name": "Build Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"gpt-4o-mini\", temperature: 0, response_format: { type: \"json_object\" }, messages: [ { role: \"user\", content: $json.prompt} ] }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        848,
+        176
+      ],
+      "id": "f8343cb8-9484-4e77-a5c0-9ac4e3bb0d52",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "SYpGRkU0nCCv3rd3",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Roles",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_ROLES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ROLES_TABLE_ID"
+        },
+        "filterByFormula": "{Role Title} = \"Marketing Coordinator\"",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        176
+      ],
+      "id": "331fbfcb-9a84-431a-8362-33d79ea0913b",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Roles",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Score": "={{ $('Normalize').first().json.score }}",
+            "Name": "={{ $('HireFlow — Resume Intake').first().json.Name }}",
+            "Email": "={{ $('HireFlow — Resume Intake').first().json.Email }}",
+            "Role": "={{ $('Search records').first().json.fields['Role Title'] }}",
+            "Recommendation": "={{ $('Normalize').first().json.recommendation }}",
+            "Stage": "Screened",
+            "Summary": "={{ $('Normalize').first().json.summary }}",
+            "Reasoning": "={{ $('Normalize').first().json.reasoning }}",
+            "Must-have Misses": "={{ $('Normalize').first().json.must_have_misses.join('\\n') }}",
+            "Resume Text": "={{ $('Extract from File').first().json.text }}",
+            "Red Flags": "={{ $('Normalize').first().json.red_flags.join('\\n') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Maybe",
+                  "value": "Maybe"
+                },
+                {
+                  "name": "Not a fit",
+                  "value": "Not a fit"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Screened",
+                  "value": "Screened"
+                },
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Interview",
+                  "value": "Interview"
+                },
+                {
+                  "name": "Offer",
+                  "value": "Offer"
+                },
+                {
+                  "name": "Hired",
+                  "value": "Hired"
+                },
+                {
+                  "name": "Not proceeding",
+                  "value": "Not proceeding"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reasoning",
+              "displayName": "Reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Must-have Misses",
+              "displayName": "Must-have Misses",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Red Flags",
+              "displayName": "Red Flags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resume Text",
+              "displayName": "Resume Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1744,
+        208
+      ],
+      "id": "5057e0b0-4726-426b-9fea-9f5a8f12dc21",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Roles",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "filterByFormula": "=AND({Email} = \"{{ $('HireFlow — Resume Intake').first().json.Email }}\", {Role} = \"{{ $('Search records').first().json.fields['Role Title'] }}\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        176
+      ],
+      "id": "7ddc275e-20e2-4941-8d9f-2410d0915ce2",
+      "name": "Search records1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "43ef2526-3b4e-40ce-8d53-98aaf831fa7d",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1488,
+        176
+      ],
+      "id": "667d135f-2026-4fd0-8299-b9d2831f2032",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('HireFlow — Resume Intake').first().json.Email }}",
+        "subject": "Thanks for applying — we've received your application",
+        "message": "=Hi {{ $('HireFlow — Resume Intake').first().json.Name }},\n\nThanks for applying for the {{ $('Search records').first().json.fields['Role Title'] }} role — this is a quick note to confirm we've received your application and it's now with our team for review.\n\nIf there's a fit, someone will be in touch about next steps. Either way, we appreciate the time you took to apply.\n\nBest,\nThe Hiring Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1936,
+        208
+      ],
+      "id": "4facef1d-ecc1-4f73-b593-93078d82134d",
+      "name": "Send a message",
+      "webhookId": "79169987-b248-4a62-b08f-7f390ac80868",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dku6asR2rjX2ypmP",
+          "name": "Gmail account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "hireflown8n"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ JSON.stringify({\n  blocks: [\n    { type: \"header\", text: { type: \"plain_text\", text: \"New candidate — review needed\" } },\n    { type: \"section\", fields: [\n      { type: \"mrkdwn\", text: `*Candidate:*\\n${$('HireFlow — Resume Intake').first().json.Name}` },\n      { type: \"mrkdwn\", text: `*Role:*\\n${$('Search records').first().json.fields['Role Title']}` },\n      { type: \"mrkdwn\", text: `*Score:*\\n${$('Normalize').first().json.score}/100` },\n      { type: \"mrkdwn\", text: `*Recommendation:*\\n${$('Normalize').first().json.recommendation}` }\n    ] },\n    { type: \"section\", text: { type: \"mrkdwn\", text: `*Summary:*\\n${$('Normalize').first().json.summary}` } },\n    { type: \"section\", text: { type: \"mrkdwn\", text: `*Must-have misses:*\\n${($('Normalize').first().json.must_have_misses || []).join('\\n') || '—'}` } },\n    { type: \"actions\", block_id: \"hireflow_decision\", elements: [\n      { type: \"button\", style: \"primary\", text: { type: \"plain_text\", text: \"✅ Approve — draft invite\" }, action_id: \"approve\",\n        value: JSON.stringify({ recordId: $('Create a record').first().json.id, role: $('Search records').first().json.fields['Role Title'], name: $('HireFlow — Resume Intake').first().json.Name, email: $('HireFlow — Resume Intake').first().json.Email }) },\n      { type: \"button\", style: \"danger\", text: { type: \"plain_text\", text: \"✕ Decline — draft rejection\" }, action_id: \"decline\",\n        value: JSON.stringify({ recordId: $('Create a record').first().json.id, role: $('Search records').first().json.fields['Role Title'], name: $('HireFlow — Resume Intake').first().json.Name, email: $('HireFlow — Resume Intake').first().json.Email }) }\n    ] }\n  ]\n}) }}",
+        "text": "=",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        2144,
+        208
+      ],
+      "id": "7d7de63e-2567-43c5-bc33-ba1aa36a356d",
+      "name": "Send a message1",
+      "webhookId": "e3c65ff9-a47d-41ce-a79e-f1eb8743dbd9",
+      "credentials": {
+        "slackApi": {
+          "id": "GPyADZcBsBRiPvth",
+          "name": "Slack HireFlow"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 📥 HireFlow — Resume Intake & AI Screening\nA résumé hits the careers form → it's parsed, scored against a data-driven Airtable scorecard, deduped into an ATS pipeline, and the hiring manager gets a Slack review card.\n**AI recommends — a human decides.**\n**n8n · OpenAI · Airtable · Gmail · Slack**",
+        "height": 180,
+        "width": 900,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        10,
+        -300
+      ],
+      "id": "ba1d6167-21f1-4692-91d3-580466bf36b8",
+      "name": "Sticky 010421fd"
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Résumé in\nApplicant submits the careers form with a PDF. Extract From File pulls clean text from the résumé (handles column/table layouts).",
+        "height": 200,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        10,
+        -60
+      ],
+      "id": "bf81625d-9678-4a81-a265-fa107a0cfa79",
+      "name": "Sticky 08fff2f9"
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Load the scorecard\nAirtable pulls THIS role's must-haves / nice-to-haves / weights and injects them into the prompt. Change the rubric in Airtable, not the workflow — that's the multi-role story.",
+        "height": 200,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        430,
+        -60
+      ],
+      "id": "ded5cb62-6850-4fa1-9524-3fbf7ecf002b",
+      "name": "Sticky 44826fd8"
+    },
+    {
+      "parameters": {
+        "content": "### 3 · AI screening\ngpt-4o-mini scores the candidate against the scorecard, judging ONLY job-relevant evidence (ignores name/age/school dates). Normalize parses structured JSON: score, recommendation, hits/misses, red flags, reasoning = the audit log.",
+        "height": 200,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        846,
+        -60
+      ],
+      "id": "1257d9e3-2e7c-4d7e-afc4-9452b537121d",
+      "name": "Sticky ac60b929"
+    },
+    {
+      "parameters": {
+        "content": "### 4 · Dedupe & persist\nSearch + If dedupe on email+role so re-submissions don't double-file. New candidates continue; Create a record writes the scored candidate to the Airtable ATS at Stage = Screened.",
+        "height": 200,
+        "width": 640,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1270,
+        -60
+      ],
+      "id": "70f92ed0-cc41-40a0-8de8-4dfbab4482e7",
+      "name": "Sticky 12e7e8fc"
+    },
+    {
+      "parameters": {
+        "content": "### 5 · Notify\nNeutral acknowledgment auto-sent to the applicant — the ONLY auto-send in the whole build, and it's score-blind. Then a Slack review card posts to the hiring channel with Approve / Decline buttons.",
+        "height": 200,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        -60
+      ],
+      "id": "5da8d7ea-65c3-478a-9de4-9ebb528a4330",
+      "name": "Sticky 11fe1d1f"
+    }
+  ],
+  "connections": {
+    "HireFlow — Resume Intake": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Search records1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

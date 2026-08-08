@@ -1,0 +1,729 @@
+{
+  "name": "HireFlow — Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "49360d28-cdb6-4758-9f79-836a7768fe2c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "HireFlow",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "filterByFormula": "AND({Stage} = \"Hired\", {Onboarding Created} = FALSE())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1b32c76e-1910-4432-a2cd-58c576d069b0",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"gpt-4o-mini\",\n  response_format: { type: \"json_object\" },\n  messages: [\n    { role: \"system\", content: \"You are an HR onboarding assistant. Given a new hire's role, produce a practical, role-specific onboarding checklist. Return ONLY JSON of the form {\\\"items\\\":[{\\\"item\\\":string,\\\"owner\\\":\\\"IT\\\"|\\\"HR\\\"|\\\"Manager\\\"|\\\"Candidate\\\",\\\"due_day\\\":\\\"Day 1\\\"|\\\"Week 1\\\"|\\\"Month 1\\\",\\\"doc_required\\\":boolean}]}. Produce 8-12 items spanning IT provisioning, HR paperwork, manager 1:1s, and role-specific ramp-up. Set doc_required=true only where the new hire must personally submit a document (government ID, tax form, signed policy, professional certification).\" },\n    { role: \"user\", content: `New hire role: ${$json.fields.Role}. Name: ${$json.fields.Name}.` }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "151c0bb7-d451-4243-a57b-be6e1f8b8c5b",
+      "name": "HTTP Request",
+      "credentials": {
+        "openAiApi": {
+          "id": "SYpGRkU0nCCv3rd3",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nconst httpItems = $input.all();\nfor (let i = 0; i < httpItems.length; i++) {\n  const parsed = JSON.parse(httpItems[i].json.choices[0].message.content);\n  const cand = $('Search records').all()[i].json.fields;\n  for (const it of parsed.items) {\n    out.push({ json: {\n      checklist_item: it.item,\n      owner: it.owner,\n      due_day: it.due_day,\n      doc_required: !!it.doc_required,\n      candidate: cand.Name,\n      email: cand.Email,\n      role: cand.Role\n    }});\n  }\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "9965a019-4e1d-473e-83e0-66e3d1500653",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "HireFlow",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_ONBOARDING_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Onboarding",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_ONBOARDING_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Doc Required": "={{ $json.doc_required }}",
+            "Checklist Item": "={{ $json.checklist_item }}",
+            "Candidate": "={{ $json.candidate }}",
+            "Email": "={{ $json.email }}",
+            "Role": "={{ $json.role }}",
+            "Owner": "={{ $json.owner }}",
+            "Status": "To do",
+            "Due Day": "={{ $json.due_day }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Checklist Item",
+              "displayName": "Checklist Item",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Candidate",
+              "displayName": "Candidate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Owner",
+              "displayName": "Owner",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "HR",
+                  "value": "HR"
+                },
+                {
+                  "name": "IT",
+                  "value": "IT"
+                },
+                {
+                  "name": "Manager",
+                  "value": "Manager"
+                },
+                {
+                  "name": "Candidate",
+                  "value": "Candidate"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Due Day",
+              "displayName": "Due Day",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Day 1",
+                  "value": "Day 1"
+                },
+                {
+                  "name": "Week 1",
+                  "value": "Week 1"
+                },
+                {
+                  "name": "Month 1",
+                  "value": "Month 1"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "To do",
+                  "value": "To do"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Doc Required",
+              "displayName": "Doc Required",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "47133f8c-e200-4c6e-a76b-3db8cac41562",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Welcome to the team, {{ $json.fields.Name }}! 🎉",
+        "message": "=Hi {{ $json.fields.Name }},  Welcome aboard — we're thrilled to have you joining us as our new {{ $json.fields.Role }}!  We're getting everything ready for your first day. You'll receive your onboarding checklist shortly; a few early items (ID and tax paperwork) will need your input, and IT will have your accounts and equipment set up before you start.  We've also blocked time for a Day-1 orientation so you can meet the team and get settled.  Can't wait to work with you.  Warm regards, The Team",
+        "options": {
+          "sendTo": "={{ $json.fields.Email }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        208
+      ],
+      "id": "ca27f517-2e7c-488e-9bef-376ce35a791a",
+      "name": "Create a draft",
+      "webhookId": "55c4ff1c-995e-4589-a089-81ffdcc090cc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dku6asR2rjX2ypmP",
+          "name": "Gmail account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "you@example.com",
+          "mode": "list",
+          "cachedResultName": "you@example.com"
+        },
+        "start": "={{ $now.plus({ days: 7 }).set({ hour: 9, minute: 0, second: 0 }).toISO() }}",
+        "end": "={{ $now.plus({ days: 7 }).set({ hour: 10, minute: 0, second: 0 }).toISO() }}",
+        "additionalFields": {
+          "description": "New hire orientation and team intro. Onboarding checklist in Airtable.",
+          "summary": "=Day 1 Orientation — {{ $('Search records').item.json.fields.Name }} ({{ $('Search records').item.json.fields.Role }})"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        208
+      ],
+      "id": "ea38017f-02d3-4841-a653-acad4d2d4454",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "cbpTHgNL1Qh9uhoP",
+          "name": "Google Calendar account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "HireFlow",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_CANDIDATES_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Candidates",
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_CANDIDATES_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Onboarding Created": true,
+            "id": "={{ $('Search records').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Maybe",
+                  "value": "Maybe"
+                },
+                {
+                  "name": "Not a fit",
+                  "value": "Not a fit"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Stage",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Screened",
+                  "value": "Screened"
+                },
+                {
+                  "name": "Shortlist",
+                  "value": "Shortlist"
+                },
+                {
+                  "name": "Interview",
+                  "value": "Interview"
+                },
+                {
+                  "name": "Offer",
+                  "value": "Offer"
+                },
+                {
+                  "name": "Hired",
+                  "value": "Hired"
+                },
+                {
+                  "name": "Not proceeding",
+                  "value": "Not proceeding"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reasoning",
+              "displayName": "Reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Must-have Misses",
+              "displayName": "Must-have Misses",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Red Flags",
+              "displayName": "Red Flags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Resume Text",
+              "displayName": "Resume Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Onboarding Created",
+              "displayName": "Onboarding Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        208
+      ],
+      "id": "ffec479d-ef33-4039-87aa-7f9f6246e12d",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "L3Nw4R1hWOQiVjfY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🚀 HireFlow — Onboarding Autopilot\nWhen a candidate turns Hired, this builds their role-specific onboarding checklist in the ATS, drafts a welcome email, books a Day-1 orientation, and flags them done so nobody's onboarded twice.\n**n8n · OpenAI · Airtable · Gmail · Google Calendar**",
+        "height": 180,
+        "width": 880,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -400
+      ],
+      "id": "10a8b285-fe30-4797-b8d4-5db63ffc7fa5",
+      "name": "Sticky 14a41234"
+    },
+    {
+      "parameters": {
+        "content": "### 1 · Poll for new hires\nSchedule + Airtable Search for Stage = Hired AND Onboarding Created = FALSE. Poll-not-push: it can't miss the moment someone is hired, and the flag guarantees no one is onboarded twice.",
+        "height": 160,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -10,
+        -240
+      ],
+      "id": "e809df64-5748-4ba1-80bb-50fc3e5ffec4",
+      "name": "Sticky a3086636"
+    },
+    {
+      "parameters": {
+        "content": "### 2 · Generate checklist\ngpt-4o-mini writes a role-specific onboarding checklist (IT provisioning, HR paperwork, manager 1:1s, role ramp) as structured JSON.",
+        "height": 160,
+        "width": 200,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        406,
+        -240
+      ],
+      "id": "188f550a-0c99-4108-894e-cd6a7fb07314",
+      "name": "Sticky 8eed9933"
+    },
+    {
+      "parameters": {
+        "content": "### 3 · Write checklist rows\nCode explodes the checklist into one item each; Create a record writes them to the Onboarding table with owner, due day, and a doc-required flag.",
+        "height": 160,
+        "width": 420,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        614,
+        -240
+      ],
+      "id": "b3472ae9-171c-4449-bcd0-1bc6482eabd8",
+      "name": "Sticky 7a256945"
+    },
+    {
+      "parameters": {
+        "content": "### 4 · Prep + guard\nBranched off the CANDIDATE stream (not the rows) so it fires ONCE, not per checklist item: a Gmail welcome DRAFT + a Day-1 calendar event, then Update flips Onboarding Created = true so the next poll skips this hire.",
+        "height": 160,
+        "width": 680,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        614,
+        360
+      ],
+      "id": "e6e5abfd-a185-4e7a-b9ea-be867de8e155",
+      "name": "Sticky 37d96c8f"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
