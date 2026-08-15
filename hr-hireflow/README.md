@@ -2,6 +2,8 @@
 
 Careers inbox → **AI-screened candidate** → **human-approved** interview/rejection drafts → **onboarding autopilot** → **weekly HR brief**. Five n8n workflows that run the whole hire-to-onboarded lifecycle for a small team, without the office manager drowning in résumés or ghosting candidates.
 
+**▶ [Watch the demo](https://www.loom.com/share/d8cd666fdcd94a1980e687b8ac700dc5)** — résumé in, Slack review card, one click, draft out.
+
 > **Built as decision *support*, never a decision *maker*.**
 > AI hiring tools are regulated (NYC Local Law 144; the EU AI Act treats hiring AI as high-risk). HireFlow is designed around that from the first node:
 > - The AI **ranks candidates for human review**. It can auto-send only the neutral "we received your application" acknowledgment. **Every interview invite and every rejection is a Gmail draft behind a human click** — there is deliberately **no auto-reject path anywhere in the system.**
